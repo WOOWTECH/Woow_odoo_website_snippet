@@ -315,9 +315,11 @@ woow_snippet_builder/
 │           └── s_woow_data_table/
 │               ├── 000.js               # 前端 Widget（分頁/搜尋/排序）
 │               └── options.js           # 編輯器選項（自動填充欄位）
-└── docs/
-    ├── LLM_KNOWLEDGE_BASE.md            # 技術知識庫
-    └── MANUAL_zh-TW.md                  # 中文使用教學手冊
+
+docs/
+├── MANUAL_zh-TW.md                      # 中文使用教學手冊
+├── LLM_KNOWLEDGE_BASE.md                # AI / LLM 技術知識庫
+└── screenshots/                         # 本 README 引用的所有截圖
 ```
 
 ---

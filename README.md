@@ -374,6 +374,8 @@ woow_snippet_builder/
 │           └── options.js                   # WoowDataTableOptions (extends SnippetOptionWidget)
 │
 └── docs/
+    ├── MANUAL_zh-TW.md                      # User manual (Traditional Chinese)
+    ├── LLM_KNOWLEDGE_BASE.md                # AI / LLM technical knowledge base
     └── screenshots/                         # All screenshots referenced in this README
 ```
 
