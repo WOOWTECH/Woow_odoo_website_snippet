@@ -35,6 +35,11 @@ no backend navigation, no custom views, no code required.*
 
 **WoOW Snippet Builder** extends the Odoo 18 Website module with four drag-and-drop snippet blocks that render live data from any whitelisted Odoo model. All configuration is done inside the website editor's **BLOCKS** and **CUSTOMIZE** panels -- content editors never need to leave the page.
 
+<p align="center">
+  <img src="docs/screenshots/showcase_full.png" alt="WoOW Snippet Builder -- Full showcase page demonstrating all four snippet types rendering live Odoo data" width="720"/>
+</p>
+<p align="center"><em>Full showcase page -- Stat Cards, Charts, Data Table, and Dynamic Content working together on a single page</em></p>
+
 ### Why This Module?
 
 | Capability | Native Odoo Snippets | WoOW Snippet Builder |
@@ -62,6 +67,21 @@ Extends the native `s_dynamic_snippet` system to render records from **any** whi
 - **Model override** -- Custom `_render()` on `website.snippet.filter` bypasses the native model-name guard for `woow_generic_mapping` templates
 - **Demo data** -- Ships with 2 preconfigured snippet filters (Contacts, Companies)
 
+<p align="center">
+  <img src="docs/screenshots/showcase_dynamic_content.png" alt="Dynamic Content snippet -- Card template rendering contact records with avatar images, names, emails, and cities" width="720"/>
+</p>
+<p align="center"><em>Dynamic Content -- Card template displaying contacts from res.partner with generic field mapping</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/demo_dynamic_content_cards.png" alt="Dynamic Content card view -- grid layout showing multiple contact cards with profile images" width="720"/>
+</p>
+<p align="center"><em>Card view layout -- contact records displayed as image-backed cards with field_0 (name), field_1 (email), field_2 (city)</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/demo_dynamic_content_list.png" alt="Dynamic Content list view -- compact row-based layout with avatar thumbnails" width="720"/>
+</p>
+<p align="center"><em>List view layout -- same data rendered in a compact row format with inline avatars</em></p>
+
 ### 2. Stat Card
 
 Aggregation-based KPI cards that summarise a single numeric value from any model.
@@ -75,6 +95,16 @@ Aggregation-based KPI cards that summarise a single numeric value from any model
 - **Group-by breakdown** -- Optional secondary breakdown list below the main value
 - **RPC endpoint** -- `POST /woow_snippet/stat`
 
+<p align="center">
+  <img src="docs/screenshots/showcase_hero.png" alt="Stat Card snippet -- hero banner with four stat cards showing Default (count), Progress Bar (42%), Trend (+20% delta), and Threshold (warning at 42%) styles" width="720"/>
+</p>
+<p align="center"><em>All four Stat Card styles side by side -- Default, Progress Bar, Trend, and Threshold</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/demo_stat_cards.png" alt="Stat Cards from demo page -- KPI cards showing counts and aggregations from various Odoo models" width="720"/>
+</p>
+<p align="center"><em>Stat Cards demo -- aggregated KPI values pulled from Odoo models in real time</em></p>
+
 ### 3. Chart
 
 Chart.js-powered visualisations rendered directly inside the website editor preview.
@@ -86,6 +116,21 @@ Chart.js-powered visualisations rendered directly inside the website editor prev
 - **Gauge display** -- Half-doughnut with centre label, configurable max value
 - **RPC endpoint** -- `POST /woow_snippet/chart`
 
+<p align="center">
+  <img src="docs/screenshots/showcase_charts.png" alt="Chart snippet -- Bar Chart showing partner count by country and Pie Chart breaking down the same data as coloured slices" width="720"/>
+</p>
+<p align="center"><em>Bar Chart and Pie Chart -- partner count grouped by country with auto-applied colour palette</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/showcase_charts_2.png" alt="Additional chart types -- Radar chart and other visualisation types demonstrating the full range of Chart.js integration" width="720"/>
+</p>
+<p align="center"><em>More chart types -- Radar and additional visualisations powered by Chart.js</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/demo_charts.png" alt="Charts demo session -- four chart types shown together: bar chart, doughnut chart, radar chart, and line chart" width="720"/>
+</p>
+<p align="center"><em>Chart variety -- Bar, Doughnut, Radar, and Line charts rendering live Odoo data</em></p>
+
 ### 4. Data Table
 
 Paginated, searchable, sortable tables for displaying structured records.
@@ -96,6 +141,16 @@ Paginated, searchable, sortable tables for displaying structured records.
 - **XSS-safe** -- All cell values pass through `_escapeHtml()` before DOM insertion
 - **Auto-field detection** -- Selecting a model in the editor auto-populates the first 5 fields
 - **RPC endpoint** -- `POST /woow_snippet/data_table`
+
+<p align="center">
+  <img src="docs/screenshots/showcase_data_table.png" alt="Data Table snippet -- paginated table showing 10 of 30 contact records with Name, Email, City columns, search bar, and pagination controls" width="720"/>
+</p>
+<p align="center"><em>Data Table -- searchable, sortable, paginated table showing contacts (page 1 of 3, 10 per page)</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/demo_data_table.png" alt="Data Table from demo session -- structured record display with column headers and row data" width="720"/>
+</p>
+<p align="center"><em>Data Table demo -- structured tabular view of Odoo records with sorting and search</em></p>
 
 ---
 
@@ -319,61 +374,129 @@ woow_snippet_builder/
 │           └── options.js                   # WoowDataTableOptions (extends SnippetOptionWidget)
 │
 └── docs/
-    └── screenshots/
-        ├── website_frontend.png             # Website frontend overview
-        ├── website_backend.png              # Website backend dashboard
-        ├── apps_modules.png                 # Odoo Apps/Modules page
-        ├── snippet_filters_list.png         # Snippet filter records
-        ├── api_models.png                   # /woow_snippet/models endpoint response
-        ├── api_fields_partner.png           # /woow_snippet/fields endpoint response
-        └── website_pages.png                # Website pages list
+    └── screenshots/                         # All screenshots referenced in this README
 ```
 
 ---
 
 ## Screenshots
 
-### Odoo Apps / Modules Page
+A comprehensive visual tour of WoOW Snippet Builder -- from installation to public rendering.
 
-<div align="center">
-<img src="docs/screenshots/apps_modules.png" alt="WoOW Snippet Builder in Odoo Apps" width="800"/>
-</div>
+### Showcase Page -- Full Overview
 
-### Website Frontend Overview
+The showcase page demonstrates all four snippet types working together on a single Odoo webpage.
 
-<div align="center">
-<img src="docs/screenshots/website_frontend.png" alt="Website frontend with WoOW snippets" width="800"/>
-</div>
+<p align="center">
+  <img src="docs/screenshots/showcase_full.png" alt="Complete showcase page -- full-length screenshot showing hero banner, stat cards, charts, data table, and dynamic content sections rendered with live Odoo data" width="720"/>
+</p>
+<p align="center"><em>Full showcase page -- every snippet type rendering live data on a single page</em></p>
 
-### Website Backend Dashboard
+### Hero Section with Stat Cards
 
-<div align="center">
-<img src="docs/screenshots/website_backend.png" alt="Website backend dashboard" width="800"/>
-</div>
+<p align="center">
+  <img src="docs/screenshots/showcase_hero.png" alt="Showcase hero section -- banner area with four stat cards below showing Default count, Progress Bar at 42%, Trend with +20% delta, and Threshold with warning status" width="720"/>
+</p>
+<p align="center"><em>Hero section -- banner with all four Stat Card styles (Default, Progress, Trend, Threshold)</em></p>
 
-### Website Pages
+<p align="center">
+  <img src="docs/screenshots/showcase_stat_cards.png" alt="Stat cards section close-up -- four KPI cards displaying different aggregation render styles" width="720"/>
+</p>
+<p align="center"><em>Stat Cards close-up -- aggregated KPI values with colour-coded styles</em></p>
 
-<div align="center">
-<img src="docs/screenshots/website_pages.png" alt="Website pages list" width="800"/>
-</div>
+### Charts
 
-### Snippet Filter Records
+<p align="center">
+  <img src="docs/screenshots/showcase_charts.png" alt="Charts section -- Bar Chart showing partner distribution by country alongside a Pie Chart with matching data" width="720"/>
+</p>
+<p align="center"><em>Bar Chart and Pie Chart -- partner count by country</em></p>
 
-<div align="center">
-<img src="docs/screenshots/snippet_filters_list.png" alt="Snippet filter records" width="800"/>
-</div>
+<p align="center">
+  <img src="docs/screenshots/showcase_charts_2.png" alt="Additional charts section -- Radar chart and other visualisation types" width="720"/>
+</p>
+<p align="center"><em>Radar and additional chart types</em></p>
 
-### API Endpoint: Available Models
+### Data Table
 
-<div align="center">
-<img src="docs/screenshots/api_models.png" alt="/woow_snippet/models endpoint response" width="800"/>
-</div>
+<p align="center">
+  <img src="docs/screenshots/showcase_data_table.png" alt="Data Table section -- paginated table with search bar showing 1-10 of 30 records with Name, Email, and City columns" width="720"/>
+</p>
+<p align="center"><em>Data Table -- searchable, sortable, paginated (showing 1--10 of 30)</em></p>
 
-### API Endpoint: Model Fields
+### Dynamic Content
 
-<div align="center">
-<img src="docs/screenshots/api_fields_partner.png" alt="/woow_snippet/fields endpoint for res.partner" width="800"/>
-</div>
+<p align="center">
+  <img src="docs/screenshots/showcase_dynamic_content.png" alt="Dynamic Content section -- Card template rendering contact records with avatar images and generic field mapping" width="720"/>
+</p>
+<p align="center"><em>Dynamic Content -- Card template with contacts from res.partner</em></p>
+
+### Public View (No Login Required)
+
+These screenshots show the showcase page as seen by unauthenticated visitors -- all snippets render via public endpoints.
+
+<p align="center">
+  <img src="docs/screenshots/public_showcase_top.png" alt="Public showcase view -- top of page as seen by unauthenticated visitors showing hero section and stat cards" width="720"/>
+</p>
+<p align="center"><em>Public view -- top of showcase page (no login)</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/public_showcase_full.png" alt="Public showcase full page -- complete page view accessible without authentication" width="720"/>
+</p>
+<p align="center"><em>Public view -- full showcase page accessible without authentication</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/demo_showcase_hero.png" alt="Public hero section -- stat cards and hero banner visible to anonymous site visitors" width="720"/>
+</p>
+<p align="center"><em>Public hero section with stat cards</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/demo_showcase_dynamic_content.png" alt="Public dynamic content -- contact cards visible to anonymous visitors" width="720"/>
+</p>
+<p align="center"><em>Public dynamic content section</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/demo_showcase_top.png" alt="Public showcase top section -- page header and navigation as seen by public visitors" width="720"/>
+</p>
+<p align="center"><em>Public top section</em></p>
+
+### Demo Page
+
+<p align="center">
+  <img src="docs/screenshots/snippet_demo_top.png" alt="Demo page top section -- showing the snippet demo page with initial snippet blocks" width="720"/>
+</p>
+<p align="center"><em>Demo page -- top section with snippet blocks</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/snippet_demo_full.png" alt="Demo page full screenshot -- complete demo page showing all snippet types in their demo configuration" width="720"/>
+</p>
+<p align="center"><em>Demo page -- full page view</em></p>
+
+### Backend Administration
+
+<p align="center">
+  <img src="docs/screenshots/apps_modules.png" alt="Odoo Apps page -- WoOW Snippet Builder module visible in the apps list with Install button" width="720"/>
+</p>
+<p align="center"><em>Apps / Modules page -- WoOW Snippet Builder ready to install</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/website_backend.png" alt="Website backend dashboard -- Odoo 18 website administration panel" width="720"/>
+</p>
+<p align="center"><em>Website backend dashboard</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/website_pages.png" alt="Website pages list -- showing available pages including the WoOW showcase and demo pages" width="720"/>
+</p>
+<p align="center"><em>Website pages list -- showcase and demo pages</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/snippet_filters_list.png" alt="Snippet filter records in backend -- showing preconfigured Contacts and Companies filters" width="720"/>
+</p>
+<p align="center"><em>Snippet Filter records -- preconfigured Contacts and Companies filters</em></p>
+
+<p align="center">
+  <img src="docs/screenshots/website_frontend.png" alt="Website frontend view -- Odoo website as seen from the frontend on port 9104" width="720"/>
+</p>
+<p align="center"><em>Website frontend overview</em></p>
 
 ---
 
@@ -415,6 +538,11 @@ woow_snippet_builder/
    odoo -d <dbname> -i woow_snippet_builder --stop-after-init
    ```
 
+<p align="center">
+  <img src="docs/screenshots/apps_modules.png" alt="Odoo Apps page showing WoOW Snippet Builder module ready for installation" width="720"/>
+</p>
+<p align="center"><em>Find and install WoOW Snippet Builder from the Odoo Apps page</em></p>
+
 > **Note:** The module depends only on `website`. No additional Python packages or external libraries are required -- Chart.js is bundled with Odoo's web assets.
 
 ---
@@ -450,6 +578,11 @@ Click the snippet on the page to open the **CUSTOMIZE** panel on the right. Each
 | **Template** | Choose from 6 QWeb templates (Card, List, Hero Card, Compact, Table, Timeline) |
 | **Number of Records** | Limit how many records to display |
 
+<p align="center">
+  <img src="docs/screenshots/showcase_dynamic_content.png" alt="Dynamic Content snippet configured with Card template showing contacts with avatars and field values" width="720"/>
+</p>
+<p align="center"><em>Dynamic Content configured with the Card template -- contacts rendered via generic field mapping</em></p>
+
 #### Stat Card
 
 | Option | Description |
@@ -463,6 +596,11 @@ Click the snippet on the page to open the **CUSTOMIZE** panel on the right. Each
 | **Previous Value** | Comparison value for trend style |
 | **Domain** | Optional Odoo domain filter, e.g. `[('active','=',True)]` |
 
+<p align="center">
+  <img src="docs/screenshots/showcase_stat_cards.png" alt="Four stat card styles -- Default showing raw count, Progress Bar at 42%, Trend with positive delta, Threshold with warning colour" width="720"/>
+</p>
+<p align="center"><em>Stat Card styles -- Default, Progress Bar, Trend, and Threshold with live data</em></p>
+
 #### Chart
 
 | Option | Description |
@@ -475,6 +613,11 @@ Click the snippet on the page to open the **CUSTOMIZE** panel on the right. Each
 | **Gauge Max** | Maximum value for gauge chart type |
 | **Domain** | Optional Odoo domain filter |
 
+<p align="center">
+  <img src="docs/screenshots/showcase_charts.png" alt="Chart snippet configured as Bar and Pie charts -- partner count grouped by country_id" width="720"/>
+</p>
+<p align="center"><em>Chart configured as Bar + Pie -- partner count by country</em></p>
+
 #### Data Table
 
 | Option | Description |
@@ -486,9 +629,23 @@ Click the snippet on the page to open the **CUSTOMIZE** panel on the right. Each
 | **Sortable** | Enable / disable column header sorting |
 | **Domain** | Optional Odoo domain filter |
 
+<p align="center">
+  <img src="docs/screenshots/showcase_data_table.png" alt="Data Table configured with res.partner model -- showing Name, Email, City columns with search and pagination" width="720"/>
+</p>
+<p align="center"><em>Data Table configured for res.partner -- search, sort, and paginate through records</em></p>
+
 ### Step 4 -- Save and Publish
 
 Click **Save** in the editor toolbar. The snippets will render live data on the published page.
+
+### Snippet Filter Records (Backend)
+
+The Dynamic Content snippet relies on `website.snippet.filter` records. Two are shipped by default:
+
+<p align="center">
+  <img src="docs/screenshots/snippet_filters_list.png" alt="Backend list view of website.snippet.filter records -- showing Contacts and Companies filters with their model and template assignments" width="720"/>
+</p>
+<p align="center"><em>Snippet Filter records in the backend -- Contacts and Companies are preconfigured</em></p>
 
 ---
 
@@ -562,6 +719,11 @@ Returns the list of whitelisted models with human-readable names.
 ]
 ```
 
+<p align="center">
+  <img src="docs/screenshots/api_models.png" alt="JSON response from /woow_snippet/models endpoint -- array of objects with model technical name and human-readable label for all 28 whitelisted models" width="720"/>
+</p>
+<p align="center"><em>API response -- /woow_snippet/models returns all 28 whitelisted models with display names</em></p>
+
 ---
 
 ### GET Model Fields
@@ -588,6 +750,11 @@ Auth: user (session required)
 ```
 
 > Excludes `one2many`, `binary`, `serialized`, `properties`, and `properties_definition` fields. Only stored fields are returned.
+
+<p align="center">
+  <img src="docs/screenshots/api_fields_partner.png" alt="JSON response from /woow_snippet/fields endpoint for res.partner -- array of field objects with name, string label, and type for each stored field" width="720"/>
+</p>
+<p align="center"><em>API response -- /woow_snippet/fields for res.partner shows field names, labels, and types</em></p>
 
 ---
 
