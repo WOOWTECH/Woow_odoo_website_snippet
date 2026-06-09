@@ -23,6 +23,12 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
         this._searchTerm = '';
         this._searchTimeout = null;
         await this._loadAndRender();
+        this._startAutoRefresh();
+    },
+
+    destroy() {
+        this._stopAutoRefresh();
+        this._super(...arguments);
     },
 
     // ------------------------------------------------------------------
@@ -63,6 +69,20 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
     // ------------------------------------------------------------------
     // Private
     // ------------------------------------------------------------------
+
+    _startAutoRefresh() {
+        const interval = parseInt(this.el.dataset.refreshInterval, 10);
+        if (interval && interval >= 5) {
+            this._refreshTimer = setInterval(() => this._loadAndRender(), interval * 1000);
+        }
+    },
+
+    _stopAutoRefresh() {
+        if (this._refreshTimer) {
+            clearInterval(this._refreshTimer);
+            this._refreshTimer = null;
+        }
+    },
 
     async _loadAndRender() {
         const ds = this.el.dataset;

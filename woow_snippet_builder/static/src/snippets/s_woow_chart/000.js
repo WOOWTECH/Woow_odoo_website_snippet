@@ -21,9 +21,11 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
     async start() {
         await this._super(...arguments);
         await this._loadAndRender();
+        this._startAutoRefresh();
     },
 
     destroy() {
+        this._stopAutoRefresh();
         this._destroyChart();
         this._super(...arguments);
     },
@@ -31,6 +33,20 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
     // ------------------------------------------------------------------
     // Private
     // ------------------------------------------------------------------
+
+    _startAutoRefresh() {
+        const interval = parseInt(this.el.dataset.refreshInterval, 10);
+        if (interval && interval >= 5) {
+            this._refreshTimer = setInterval(() => this._loadAndRender(), interval * 1000);
+        }
+    },
+
+    _stopAutoRefresh() {
+        if (this._refreshTimer) {
+            clearInterval(this._refreshTimer);
+            this._refreshTimer = null;
+        }
+    },
 
     async _loadAndRender() {
         const ds = this.el.dataset;
