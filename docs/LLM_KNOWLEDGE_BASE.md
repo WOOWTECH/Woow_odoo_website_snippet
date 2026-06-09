@@ -1001,6 +1001,49 @@ class MyController(WoowSnippetController):
         return super()._get_allowed_models() | {'my.custom.model'}
 ```
 
+### Q: How to integrate with Home Assistant (odoo_ha_addon)?
+
+The `odoo_ha_addon` module provides 4 HA models that work with WoOW snippets:
+
+| Model | Description | Key Fields |
+|-------|-------------|------------|
+| `ha.entity` | HA entities (sensors, switches, etc.) | `entity_id`, `name`, `domain`, `entity_state` |
+| `ha.device` | HA devices | `name`, `manufacturer`, `model` |
+| `ha.entity.group` | Entity groups | `name`, `entity_count`, `description` |
+| `ha.entity.history` | State history | `entity_state`, `last_changed`, `num_state` |
+
+**Step 1:** Add HA models to the whitelist. Either modify `_DEFAULT_ALLOWED_MODELS` directly or use the extension pattern:
+
+```python
+class HASnippetController(WoowSnippetController):
+    def _get_allowed_models(self):
+        return super()._get_allowed_models() | {
+            'ha.entity', 'ha.device',
+            'ha.entity.group', 'ha.entity.history',
+        }
+```
+
+**Step 2:** Create `website.snippet.filter` records for Dynamic Content:
+
+| Filter Name | Model | Fields | Domain |
+|-------------|-------|--------|--------|
+| HA Entities (All) | `ha.entity` | `entity_id,name,domain,entity_state` | `[]` |
+| HA Entities (Sensors) | `ha.entity` | `entity_id,name,entity_state` | `[('domain','=','sensor')]` |
+| HA Devices | `ha.device` | `name,manufacturer,model` | `[]` |
+| HA Entity Groups | `ha.entity.group` | `name,entity_count,description` | `[]` |
+| HA History | `ha.entity.history` | `entity_state,last_changed,num_state` | `[]` |
+
+**Step 3:** Use any snippet type with HA data:
+- **Stat Card:** `model=ha.entity, operation=count` → total entity count
+- **Chart:** `model=ha.entity, label_field=domain, value_field=id` → entities by domain
+- **Data Table:** `model=ha.device, fields=name,manufacturer,model` → device directory
+- **Dynamic Content:** Select an HA filter + WoOW template (card/list/compact/hero/table/timeline)
+
+**Notes:**
+- `ha.entity.history.num_state` is `store=True` so `read_group` aggregation works
+- Use `domain` filter `[('ha_instance_id','=',X)]` for multi-instance setups
+- HA data is accessed via `.sudo()` — state data is non-sensitive
+
 ### Q: How does the generic field mapping work?
 
 1. `DynamicSnippet` JS widget sets `with_context: {woow_generic_mapping: true}` in RPC params

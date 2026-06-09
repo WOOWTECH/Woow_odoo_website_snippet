@@ -102,10 +102,11 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
     _renderError(err) {
         const el = this.el.querySelector('.woow_data_table_content');
         if (el) {
+            const msg = this._escapeHtml(err.message || 'Error loading table data');
             el.innerHTML = `
                 <div class="text-center text-danger py-4">
                     <i class="fa fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                    <small>${err.message || 'Error loading table data'}</small>
+                    <small>${msg}</small>
                 </div>`;
         }
     },

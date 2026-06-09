@@ -39,6 +39,11 @@ _DEFAULT_ALLOWED_MODELS = {
     'lunch.order',
     'website.page',
     'blog.post',
+    # Home Assistant IoT models (requires odoo_ha_addon)
+    'ha.entity',
+    'ha.device',
+    'ha.entity.group',
+    'ha.entity.history',
 }
 
 _VALID_SORT_ORDERS = {'asc', 'desc'}
@@ -188,7 +193,8 @@ class WoowSnippetController(http.Controller):
                     count = g.get(f'{group_by}_count', g.get('__count', 0))
                     breakdown.append({'label': str(label), 'value': count})
             except Exception:
-                pass
+                _logger.warning('read_group failed for group_by=%s on %s',
+                                group_by, model_name, exc_info=True)
 
         target_value = float(target_value) if target_value else 100
         previous_value = float(previous_value) if previous_value else 0
@@ -258,6 +264,8 @@ class WoowSnippetController(http.Controller):
                     [label_field, series_field], lazy=False,
                 )
             except Exception:
+                _logger.warning('read_group failed for chart (multi-series) on %s',
+                                model_name, exc_info=True)
                 groups = []
 
             label_set = []
@@ -298,6 +306,8 @@ class WoowSnippetController(http.Controller):
                 groups = Model.read_group(parsed_domain, agg_fields,
                                           [label_field])
             except Exception:
+                _logger.warning('read_group failed for chart on %s',
+                                model_name, exc_info=True)
                 groups = []
 
             labels = []
