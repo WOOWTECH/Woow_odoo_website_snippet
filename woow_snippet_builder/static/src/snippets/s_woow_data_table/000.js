@@ -175,33 +175,87 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
         }
         html += '</tbody></table></div>';
 
-        // Pagination
+        // Pagination footer
         if (total > limit) {
             const totalPages = Math.ceil(total / limit);
             const currentPage = Math.floor(offset / limit);
-            html += '<nav><ul class="pagination pagination-sm justify-content-center">';
-            for (let i = 0; i < totalPages && i < 10; i++) {
-                const pgOffset = i * limit;
-                const active = i === currentPage ? 'active' : '';
-                html += `<li class="page-item ${active}">
-                    <a href="#" class="page-link woow_dt_page"
-                       data-offset="${pgOffset}">${i + 1}</a>
-                </li>`;
+
+            html += '<div class="woow_dt_footer">';
+
+            // Record count (left-aligned on desktop, centered on mobile)
+            html += `<div class="woow_dt_count">
+                ${Math.min(offset + 1, total)}\u2013${Math.min(offset + limit, total)} of ${total.toLocaleString()}
+            </div>`;
+
+            // Pagination with smart ellipsis
+            html += '<nav class="woow_dt_nav"><ul class="pagination pagination-sm mb-0 flex-wrap justify-content-center gap-1">';
+
+            // Previous button
+            if (currentPage > 0) {
+                html += `<li class="page-item">
+                    <a href="#" class="page-link woow_dt_page" data-offset="${(currentPage - 1) * limit}"
+                       aria-label="Previous">&lsaquo;</a></li>`;
             }
-            if (totalPages > 10) {
-                html += `<li class="page-item disabled">
-                    <span class="page-link">... (${totalPages} pages)</span>
-                </li>`;
+
+            // Build page numbers with ellipsis
+            const pages = this._buildPageRange(currentPage, totalPages);
+            for (const p of pages) {
+                if (p === '...') {
+                    html += '<li class="page-item disabled"><span class="page-link">\u2026</span></li>';
+                } else {
+                    const active = p === currentPage ? ' active' : '';
+                    html += `<li class="page-item${active}">
+                        <a href="#" class="page-link woow_dt_page"
+                           data-offset="${p * limit}">${p + 1}</a></li>`;
+                }
             }
+
+            // Next button
+            if (currentPage < totalPages - 1) {
+                html += `<li class="page-item">
+                    <a href="#" class="page-link woow_dt_page" data-offset="${(currentPage + 1) * limit}"
+                       aria-label="Next">&rsaquo;</a></li>`;
+            }
+
             html += '</ul></nav>';
+            html += '</div>';
+        } else if (total > 0) {
+            // No pagination needed, just show count
+            html += `<div class="woow_dt_footer">
+                <div class="woow_dt_count">${total} record${total !== 1 ? 's' : ''}</div>
+            </div>`;
         }
 
-        // Record count
-        html += `<div class="text-muted small text-center">
-            ${Math.min(offset + 1, total)}–${Math.min(offset + limit, total)} of ${total}
-        </div>`;
-
         el.innerHTML = html;
+    },
+
+    /**
+     * Build a compact page range with ellipsis.
+     * e.g. [0, '...', 4, 5, 6, 7, 8, '...', 241] for page 6 of 242.
+     * Shows at most ~7 page buttons on any screen size.
+     */
+    _buildPageRange(current, total) {
+        if (total <= 7) {
+            return Array.from({length: total}, (_, i) => i);
+        }
+        const pages = new Set();
+        // Always show first and last
+        pages.add(0);
+        pages.add(total - 1);
+        // Show window around current page
+        for (let i = Math.max(1, current - 1); i <= Math.min(total - 2, current + 1); i++) {
+            pages.add(i);
+        }
+        // Convert to sorted array and insert ellipses
+        const sorted = [...pages].sort((a, b) => a - b);
+        const result = [];
+        for (let i = 0; i < sorted.length; i++) {
+            if (i > 0 && sorted[i] - sorted[i - 1] > 1) {
+                result.push('...');
+            }
+            result.push(sorted[i]);
+        }
+        return result;
     },
 
     _escapeHtml(str) {
