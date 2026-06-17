@@ -131,10 +131,10 @@ class WoowSnippetController(http.Controller):
         return result
 
     # ------------------------------------------------------------------
-    # Public data endpoints (auth='public')
+    # Data endpoints (auth='user') — require authenticated session
     # ------------------------------------------------------------------
 
-    @http.route('/woow_snippet/stat', type='json', auth='public',
+    @http.route('/woow_snippet/stat', type='json', auth='user',
                 website=True, readonly=True)
     def get_stat(self, model_name, operation='count', field_name='',
                  group_by='', domain='[]', sub_type='default',
@@ -228,7 +228,7 @@ class WoowSnippetController(http.Controller):
 
         return result
 
-    @http.route('/woow_snippet/chart', type='json', auth='public',
+    @http.route('/woow_snippet/chart', type='json', auth='user',
                 website=True, readonly=True)
     def get_chart(self, model_name, chart_type='bar', label_field='',
                   value_field='', domain='[]', gauge_max=100,
@@ -326,7 +326,7 @@ class WoowSnippetController(http.Controller):
                 'gauge_max': float(gauge_max) if gauge_max else 100,
             }
 
-    @http.route('/woow_snippet/data_table', type='json', auth='public',
+    @http.route('/woow_snippet/data_table', type='json', auth='user',
                 website=True, readonly=True)
     def get_data_table(self, model_name, field_names='', domain='[]',
                        offset=0, limit=25, sort_field='', sort_order='asc',

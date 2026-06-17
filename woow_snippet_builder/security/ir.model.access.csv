@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_website_snippet_filter_woow_editor,website.snippet.filter.woow.editor,website.model_website_snippet_filter,website.group_website_designer,1,1,1,1
+access_website_snippet_filter_woow_public,website.snippet.filter.woow.public,website.model_website_snippet_filter,base.group_public,1,0,0,0

@@ -24,6 +24,7 @@ navigation required.
     'website': 'https://woowtech.com',
     'depends': ['website'],
     'data': [
+        'security/ir.model.access.csv',
         'data/woow_snippet_filter_data.xml',
         'data/woow_dynamic_filter_templates.xml',
         'views/snippets/snippets.xml',

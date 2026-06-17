@@ -1,0 +1,335 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# * woow_snippet_builder
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.snippets
+msgid "WoOW Dynamic"
+msgstr "WoOW 動態元件"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.woow_snippets_list
+msgid "Dynamic Content"
+msgstr "動態內容"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.woow_snippets_list
+msgid "Stat Card"
+msgstr "統計卡片"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.woow_snippets_list
+msgid "Chart"
+msgstr "圖表"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.woow_snippets_list
+msgid "Data Table"
+msgstr "資料表格"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_dynamic_content
+msgid "WoOW Dynamic Content"
+msgstr "WoOW 動態內容"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat
+msgid "WoOW Stat Card"
+msgstr "WoOW 統計卡片"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat
+msgid "Configure this stat card in the Customize panel →"
+msgstr "在自訂面板中設定此統計卡片 →"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart
+msgid "WoOW Chart"
+msgstr "WoOW 圖表"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart
+msgid "Configure this chart in the Customize panel →"
+msgstr "在自訂面板中設定此圖表 →"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table
+msgid "WoOW Data Table"
+msgstr "WoOW 資料表格"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table
+msgid "Configure this data table in the Customize panel →"
+msgstr "在自訂面板中設定此資料表格 →"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Model"
+msgstr "模型"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Operation"
+msgstr "運算"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Count"
+msgstr "計數"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Sum"
+msgstr "加總"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Average"
+msgstr "平均"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Min"
+msgstr "最小值"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Max"
+msgstr "最大值"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Count Distinct"
+msgstr "不重複計數"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Field"
+msgstr "欄位"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Group By"
+msgstr "群組依據"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "None"
+msgstr "無"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Style"
+msgstr "樣式"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Default"
+msgstr "預設"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Progress Bar"
+msgstr "進度條"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Trend (Delta)"
+msgstr "趨勢（差異）"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Threshold"
+msgstr "閾值"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Target Value"
+msgstr "目標值"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+msgid "Previous Value"
+msgstr "上期數值"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table_options
+msgid "Domain"
+msgstr "篩選條件"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Chart Type"
+msgstr "圖表類型"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Bar"
+msgstr "長條圖"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Line"
+msgstr "折線圖"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Pie"
+msgstr "圓餅圖"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Doughnut"
+msgstr "甜甜圈圖"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Radar"
+msgstr "雷達圖"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Polar Area"
+msgstr "極區圖"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Horizontal Bar"
+msgstr "橫條圖"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Stacked Bar"
+msgstr "堆疊長條圖"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Gauge"
+msgstr "儀表板"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Funnel"
+msgstr "漏斗圖"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Label Field"
+msgstr "標籤欄位"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Value Field"
+msgstr "數值欄位"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Series Field"
+msgstr "系列欄位"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+msgid "Gauge Max"
+msgstr "儀表板最大值"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table_options
+msgid "Fields (comma-sep)"
+msgstr "欄位（逗號分隔）"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table_options
+msgid "Page Size"
+msgstr "每頁筆數"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table_options
+msgid "Searchable"
+msgstr "可搜尋"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table_options
+msgid "Sortable"
+msgstr "可排序"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table_options
+msgid "Yes"
+msgstr "是"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table_options
+msgid "No"
+msgstr "否"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_stat_options
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_chart_options
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.s_woow_data_table_options
+msgid "— Select —"
+msgstr "— 請選擇 —"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.dynamic_filter_template_woow_card
+msgid "WoOW Card"
+msgstr "WoOW 卡片"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.dynamic_filter_template_woow_list
+msgid "WoOW List"
+msgstr "WoOW 清單"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.dynamic_filter_template_woow_hero
+msgid "WoOW Hero Card"
+msgstr "WoOW 主視覺卡片"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.dynamic_filter_template_woow_compact
+msgid "WoOW Compact"
+msgstr "WoOW 精簡"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.dynamic_filter_template_woow_table
+msgid "WoOW Table"
+msgstr "WoOW 表格"
+
+#. module: woow_snippet_builder
+#: model_terms:ir.ui.view,arch_db:woow_snippet_builder.dynamic_filter_template_woow_timeline
+msgid "WoOW Timeline"
+msgstr "WoOW 時間軸"
+
+#. module: woow_snippet_builder
+#: model:ir.filters,name:woow_snippet_builder.woow_filter_partners
+msgid "All Contacts"
+msgstr "所有聯絡人"
+
+#. module: woow_snippet_builder
+#: model:website.snippet.filter,name:woow_snippet_builder.woow_snippet_filter_partners
+msgid "Contacts"
+msgstr "聯絡人"
+
+#. module: woow_snippet_builder
+#: model:ir.filters,name:woow_snippet_builder.woow_filter_companies
+msgid "All Companies"
+msgstr "所有公司"
+
+#. module: woow_snippet_builder
+#: model:website.snippet.filter,name:woow_snippet_builder.woow_snippet_filter_companies
+msgid "Companies"
+msgstr "公司"
