@@ -20,12 +20,11 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
 
     async start() {
         await this._super(...arguments);
+        this._ensureStructure();
         await this._loadAndRender();
-        this._startAutoRefresh();
     },
 
     destroy() {
-        this._stopAutoRefresh();
         this._destroyChart();
         this._super(...arguments);
     },
@@ -34,17 +33,22 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
     // Private
     // ------------------------------------------------------------------
 
-    _startAutoRefresh() {
-        const interval = parseInt(this.el.dataset.refreshInterval, 10);
-        if (interval && interval >= 5) {
-            this._refreshTimer = setInterval(() => this._loadAndRender(), interval * 1000);
-        }
-    },
-
-    _stopAutoRefresh() {
-        if (this._refreshTimer) {
-            clearInterval(this._refreshTimer);
-            this._refreshTimer = null;
+    _ensureStructure() {
+        let content = this.el.querySelector('.woow_chart_content');
+        if (!content) {
+            const container = document.createElement('div');
+            container.className = 'container';
+            content = document.createElement('div');
+            content.className = 'woow_chart_content';
+            content.style.cssText = 'position:relative; height:400px;';
+            container.appendChild(content);
+            this.el.innerHTML = '';
+            this.el.appendChild(container);
+        } else if (!content.parentElement.classList.contains('container')) {
+            const container = document.createElement('div');
+            container.className = 'container';
+            content.parentElement.insertBefore(container, content);
+            container.appendChild(content);
         }
     },
 
@@ -85,11 +89,10 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
     _renderError(err) {
         const el = this.el.querySelector('.woow_chart_content');
         if (el) {
-            const msg = this._escapeHtml(err.message || 'Error loading chart data');
             el.innerHTML = `
                 <div class="text-center text-danger py-4">
                     <i class="fa fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                    <small>${msg}</small>
+                    <small>${err.message || 'Error loading chart data'}</small>
                 </div>`;
         }
     },
@@ -104,6 +107,12 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
     async _renderChart(result) {
         const container = this.el.querySelector('.woow_chart_content');
         if (!container) return;
+
+        const ds = this.el.dataset;
+
+        // Apply chart height from data attribute
+        const height = parseInt(ds.chartHeight, 10) || 400;
+        container.style.height = height + 'px';
 
         // Ensure Chart.js is loaded
         if (typeof Chart === 'undefined') {
@@ -127,6 +136,27 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
             config = this._buildFunnelConfig(result);
         } else {
             config = this._buildStandardConfig(result, chartType);
+        }
+
+        // Apply title from data attribute
+        const title = ds.title || '';
+        if (title) {
+            config.options = config.options || {};
+            config.options.plugins = config.options.plugins || {};
+            config.options.plugins.title = {
+                display: true,
+                text: title,
+                font: { size: 16, weight: 'bold' },
+                padding: { bottom: 12 },
+            };
+        }
+
+        // Apply legend visibility from data attribute
+        const showLegend = ds.showLegend;
+        if (showLegend === '0') {
+            config.options = config.options || {};
+            config.options.plugins = config.options.plugins || {};
+            config.options.plugins.legend = { display: false };
         }
 
         this._chartInstance = new Chart(ctx, config);
@@ -233,14 +263,6 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
                 },
             }],
         };
-    },
-
-    _escapeHtml(str) {
-        if (str === null || str === undefined) return '';
-        const s = String(str);
-        const div = document.createElement('div');
-        div.appendChild(document.createTextNode(s));
-        return div.innerHTML;
     },
 
     _buildFunnelConfig(result) {

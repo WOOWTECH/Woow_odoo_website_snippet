@@ -39,11 +39,14 @@ _DEFAULT_ALLOWED_MODELS = {
     'lunch.order',
     'website.page',
     'blog.post',
-    # Home Assistant IoT models (requires odoo_ha_addon)
-    'ha.entity',
+    # Home Assistant models
+    'ha.instance',
+    'ha.area',
     'ha.device',
-    'ha.entity.group',
+    'ha.entity',
     'ha.entity.history',
+    'ha.entity.group',
+    'ha.label',
 }
 
 _VALID_SORT_ORDERS = {'asc', 'desc'}
@@ -131,10 +134,10 @@ class WoowSnippetController(http.Controller):
         return result
 
     # ------------------------------------------------------------------
-    # Data endpoints (auth='user') — require authenticated session
+    # Public data endpoints (auth='public')
     # ------------------------------------------------------------------
 
-    @http.route('/woow_snippet/stat', type='json', auth='user',
+    @http.route('/woow_snippet/stat', type='json', auth='public',
                 website=True, readonly=True)
     def get_stat(self, model_name, operation='count', field_name='',
                  group_by='', domain='[]', sub_type='default',
@@ -193,8 +196,7 @@ class WoowSnippetController(http.Controller):
                     count = g.get(f'{group_by}_count', g.get('__count', 0))
                     breakdown.append({'label': str(label), 'value': count})
             except Exception:
-                _logger.warning('read_group failed for group_by=%s on %s',
-                                group_by, model_name, exc_info=True)
+                pass
 
         target_value = float(target_value) if target_value else 100
         previous_value = float(previous_value) if previous_value else 0
@@ -228,7 +230,7 @@ class WoowSnippetController(http.Controller):
 
         return result
 
-    @http.route('/woow_snippet/chart', type='json', auth='user',
+    @http.route('/woow_snippet/chart', type='json', auth='public',
                 website=True, readonly=True)
     def get_chart(self, model_name, chart_type='bar', label_field='',
                   value_field='', domain='[]', gauge_max=100,
@@ -264,8 +266,6 @@ class WoowSnippetController(http.Controller):
                     [label_field, series_field], lazy=False,
                 )
             except Exception:
-                _logger.warning('read_group failed for chart (multi-series) on %s',
-                                model_name, exc_info=True)
                 groups = []
 
             label_set = []
@@ -306,8 +306,6 @@ class WoowSnippetController(http.Controller):
                 groups = Model.read_group(parsed_domain, agg_fields,
                                           [label_field])
             except Exception:
-                _logger.warning('read_group failed for chart on %s',
-                                model_name, exc_info=True)
                 groups = []
 
             labels = []
@@ -326,7 +324,7 @@ class WoowSnippetController(http.Controller):
                 'gauge_max': float(gauge_max) if gauge_max else 100,
             }
 
-    @http.route('/woow_snippet/data_table', type='json', auth='user',
+    @http.route('/woow_snippet/data_table', type='json', auth='public',
                 website=True, readonly=True)
     def get_data_table(self, model_name, field_names='', domain='[]',
                        offset=0, limit=25, sort_field='', sort_order='asc',

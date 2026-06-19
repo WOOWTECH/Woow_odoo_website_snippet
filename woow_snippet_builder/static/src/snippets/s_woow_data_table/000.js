@@ -17,18 +17,13 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
 
     async start() {
         await this._super(...arguments);
+        this._ensureStructure();
         this._currentOffset = 0;
         this._sortField = '';
         this._sortOrder = 'asc';
         this._searchTerm = '';
         this._searchTimeout = null;
         await this._loadAndRender();
-        this._startAutoRefresh();
-    },
-
-    destroy() {
-        this._stopAutoRefresh();
-        this._super(...arguments);
     },
 
     // ------------------------------------------------------------------
@@ -70,17 +65,21 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
     // Private
     // ------------------------------------------------------------------
 
-    _startAutoRefresh() {
-        const interval = parseInt(this.el.dataset.refreshInterval, 10);
-        if (interval && interval >= 5) {
-            this._refreshTimer = setInterval(() => this._loadAndRender(), interval * 1000);
-        }
-    },
-
-    _stopAutoRefresh() {
-        if (this._refreshTimer) {
-            clearInterval(this._refreshTimer);
-            this._refreshTimer = null;
+    _ensureStructure() {
+        let content = this.el.querySelector('.woow_data_table_content');
+        if (!content) {
+            const container = document.createElement('div');
+            container.className = 'container';
+            content = document.createElement('div');
+            content.className = 'woow_data_table_content';
+            container.appendChild(content);
+            this.el.innerHTML = '';
+            this.el.appendChild(container);
+        } else if (!content.parentElement.classList.contains('container')) {
+            const container = document.createElement('div');
+            container.className = 'container';
+            content.parentElement.insertBefore(container, content);
+            container.appendChild(content);
         }
     },
 
@@ -122,11 +121,10 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
     _renderError(err) {
         const el = this.el.querySelector('.woow_data_table_content');
         if (el) {
-            const msg = this._escapeHtml(err.message || 'Error loading table data');
             el.innerHTML = `
                 <div class="text-center text-danger py-4">
                     <i class="fa fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                    <small>${msg}</small>
+                    <small>${err.message || 'Error loading table data'}</small>
                 </div>`;
         }
     },
@@ -144,6 +142,12 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
         const limit = result.limit || 25;
 
         let html = '';
+
+        // Title
+        const title = ds.title || '';
+        if (title) {
+            html += `<h5 class="fw-bold mb-3">${this._escapeHtml(title)}</h5>`;
+        }
 
         // Search bar
         if (searchable) {
@@ -195,87 +199,33 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
         }
         html += '</tbody></table></div>';
 
-        // Pagination footer
+        // Pagination
         if (total > limit) {
             const totalPages = Math.ceil(total / limit);
             const currentPage = Math.floor(offset / limit);
-
-            html += '<div class="woow_dt_footer">';
-
-            // Record count (left-aligned on desktop, centered on mobile)
-            html += `<div class="woow_dt_count">
-                ${Math.min(offset + 1, total)}\u2013${Math.min(offset + limit, total)} of ${total.toLocaleString()}
-            </div>`;
-
-            // Pagination with smart ellipsis
-            html += '<nav class="woow_dt_nav"><ul class="pagination pagination-sm mb-0 flex-wrap justify-content-center gap-1">';
-
-            // Previous button
-            if (currentPage > 0) {
-                html += `<li class="page-item">
-                    <a href="#" class="page-link woow_dt_page" data-offset="${(currentPage - 1) * limit}"
-                       aria-label="Previous">&lsaquo;</a></li>`;
+            html += '<nav><ul class="pagination pagination-sm justify-content-center">';
+            for (let i = 0; i < totalPages && i < 10; i++) {
+                const pgOffset = i * limit;
+                const active = i === currentPage ? 'active' : '';
+                html += `<li class="page-item ${active}">
+                    <a href="#" class="page-link woow_dt_page"
+                       data-offset="${pgOffset}">${i + 1}</a>
+                </li>`;
             }
-
-            // Build page numbers with ellipsis
-            const pages = this._buildPageRange(currentPage, totalPages);
-            for (const p of pages) {
-                if (p === '...') {
-                    html += '<li class="page-item disabled"><span class="page-link">\u2026</span></li>';
-                } else {
-                    const active = p === currentPage ? ' active' : '';
-                    html += `<li class="page-item${active}">
-                        <a href="#" class="page-link woow_dt_page"
-                           data-offset="${p * limit}">${p + 1}</a></li>`;
-                }
+            if (totalPages > 10) {
+                html += `<li class="page-item disabled">
+                    <span class="page-link">... (${totalPages} pages)</span>
+                </li>`;
             }
-
-            // Next button
-            if (currentPage < totalPages - 1) {
-                html += `<li class="page-item">
-                    <a href="#" class="page-link woow_dt_page" data-offset="${(currentPage + 1) * limit}"
-                       aria-label="Next">&rsaquo;</a></li>`;
-            }
-
             html += '</ul></nav>';
-            html += '</div>';
-        } else if (total > 0) {
-            // No pagination needed, just show count
-            html += `<div class="woow_dt_footer">
-                <div class="woow_dt_count">${total} record${total !== 1 ? 's' : ''}</div>
-            </div>`;
         }
+
+        // Record count
+        html += `<div class="text-muted small text-center">
+            ${Math.min(offset + 1, total)}–${Math.min(offset + limit, total)} of ${total}
+        </div>`;
 
         el.innerHTML = html;
-    },
-
-    /**
-     * Build a compact page range with ellipsis.
-     * e.g. [0, '...', 4, 5, 6, 7, 8, '...', 241] for page 6 of 242.
-     * Shows at most ~7 page buttons on any screen size.
-     */
-    _buildPageRange(current, total) {
-        if (total <= 7) {
-            return Array.from({length: total}, (_, i) => i);
-        }
-        const pages = new Set();
-        // Always show first and last
-        pages.add(0);
-        pages.add(total - 1);
-        // Show window around current page
-        for (let i = Math.max(1, current - 1); i <= Math.min(total - 2, current + 1); i++) {
-            pages.add(i);
-        }
-        // Convert to sorted array and insert ellipses
-        const sorted = [...pages].sort((a, b) => a - b);
-        const result = [];
-        for (let i = 0; i < sorted.length; i++) {
-            if (i > 0 && sorted[i] - sorted[i - 1] > 1) {
-                result.push('...');
-            }
-            result.push(sorted[i]);
-        }
-        return result;
     },
 
     _escapeHtml(str) {

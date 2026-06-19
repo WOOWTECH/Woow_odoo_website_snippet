@@ -24,7 +24,6 @@ navigation required.
     'website': 'https://woowtech.com',
     'depends': ['website'],
     'data': [
-        'security/ir.model.access.csv',
         'data/woow_snippet_filter_data.xml',
         'data/woow_dynamic_filter_templates.xml',
         'views/snippets/snippets.xml',
@@ -32,10 +31,10 @@ navigation required.
         'views/snippets/s_woow_stat.xml',
         'views/snippets/s_woow_chart.xml',
         'views/snippets/s_woow_data_table.xml',
+        'views/ha_dashboard.xml',
     ],
     'assets': {
         'web.assets_frontend': [
-            'woow_snippet_builder/static/src/snippets/s_woow_data_table/000.scss',
             'woow_snippet_builder/static/src/snippets/s_woow_dynamic_content/000.js',
             'woow_snippet_builder/static/src/snippets/s_woow_stat/000.js',
             'woow_snippet_builder/static/src/snippets/s_woow_chart/000.js',

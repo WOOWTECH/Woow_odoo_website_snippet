@@ -16,30 +16,31 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
      */
     async start() {
         await this._super(...arguments);
+        this._ensureStructure();
         await this._loadAndRender();
-        this._startAutoRefresh();
-    },
-
-    destroy() {
-        this._stopAutoRefresh();
-        this._super(...arguments);
     },
 
     // ------------------------------------------------------------------
     // Private
     // ------------------------------------------------------------------
 
-    _startAutoRefresh() {
-        const interval = parseInt(this.el.dataset.refreshInterval, 10);
-        if (interval && interval >= 5) {
-            this._refreshTimer = setInterval(() => this._loadAndRender(), interval * 1000);
-        }
-    },
-
-    _stopAutoRefresh() {
-        if (this._refreshTimer) {
-            clearInterval(this._refreshTimer);
-            this._refreshTimer = null;
+    _ensureStructure() {
+        let content = this.el.querySelector('.woow_stat_content');
+        if (!content) {
+            // Rebuild expected DOM: .container > .woow_stat_content
+            const container = document.createElement('div');
+            container.className = 'container';
+            content = document.createElement('div');
+            content.className = 'woow_stat_content text-center py-3';
+            container.appendChild(content);
+            this.el.innerHTML = '';
+            this.el.appendChild(container);
+        } else if (!content.parentElement.classList.contains('container')) {
+            // Content exists but not wrapped in .container
+            const container = document.createElement('div');
+            container.className = 'container';
+            content.parentElement.insertBefore(container, content);
+            container.appendChild(content);
         }
     },
 
@@ -83,11 +84,10 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
     _renderError(err) {
         const el = this.el.querySelector('.woow_stat_content');
         if (el) {
-            const msg = this._escapeHtml(err.message || 'Error loading data');
             el.innerHTML = `
                 <div class="text-center text-danger py-4">
                     <i class="fa fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                    <small>${msg}</small>
+                    <small>${err.message || 'Error loading data'}</small>
                 </div>`;
         }
     },
@@ -98,9 +98,10 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
 
         const value = this._formatNumber(result.value);
         const ds = this.el.dataset;
+        const customTitle = ds.title || '';
         const operation = ds.operation || 'count';
         const modelName = (ds.modelName || '').replace(/\./g, ' ');
-        const label = `${operation.charAt(0).toUpperCase() + operation.slice(1)} of ${modelName}`;
+        const label = customTitle || `${operation.charAt(0).toUpperCase() + operation.slice(1)} of ${modelName}`;
 
         let html = '';
         switch (result.sub_type) {
@@ -196,14 +197,6 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
                 </div>`;
         }
         return `<div class="mt-3 mx-auto" style="max-width:300px;">${rows}</div>`;
-    },
-
-    _escapeHtml(str) {
-        if (str === null || str === undefined) return '';
-        const s = String(str);
-        const div = document.createElement('div');
-        div.appendChild(document.createTextNode(s));
-        return div.innerHTML;
     },
 
     _formatNumber(num) {
