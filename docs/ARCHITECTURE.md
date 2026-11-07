@@ -72,7 +72,7 @@ graph TB
 
     subgraph "Server - Data Layer"
         J[6 QWeb Templates<br/><i>data/woow_dynamic_filter_templates.xml</i>]
-        K[Demo Filters<br/><i>data/woow_snippet_filter_data.xml</i>]
+        K[Demo Filters<br/><i>demo/woow_snippet_filter_demo.xml</i>]
     end
 
     subgraph "Database"
@@ -83,7 +83,7 @@ graph TB
     B -->|"data-* attrs"| C
     B -->|"data-* attrs"| D
     E -->|"RPC auth=user"| F
-    C -->|"RPC auth=public"| F
+    C -->|"RPC auth=user"| F
     D -->|"Native /s_dynamic"| H
     F -->|"Whitelist check"| G
     F -->|"ORM calls"| L
@@ -113,7 +113,7 @@ graph TB
 | 1 | XML Views | N/A (server data) | N/A | Defines snippet bodies, BLOCKS registration, CUSTOMIZE panels |
 | 2 | Frontend JS | `web.assets_frontend` | Public | Renders live widgets on published pages |
 | 3 | Editor JS | `website.assets_wysiwyg` | User (editor) | Populates CUSTOMIZE panel selects, triggers preview refresh |
-| 4 | Python Controller | N/A (server) | Mixed | 2 `auth='user'` + 3 `auth='public'` endpoints |
+| 4 | Python Controller | N/A (server) | Mixed | 5 `auth='user'` endpoints (2 editor + 3 data) |
 | 5 | Python Model | N/A (server) | Sudo | Extends `website.snippet.filter` for generic rendering |
 | 6 | Data Layer | N/A (server data) | N/A | QWeb templates + demo `ir.filters` records |
 
@@ -555,9 +555,9 @@ graph TD
     subgraph "Layer 1: Authentication"
         A1["/woow_snippet/available_models<br/>auth='user'"]
         A2["/woow_snippet/model_fields<br/>auth='user'"]
-        A3["/woow_snippet/stat<br/>auth='public'"]
-        A4["/woow_snippet/chart<br/>auth='public'"]
-        A5["/woow_snippet/data_table<br/>auth='public'"]
+        A3["/woow_snippet/stat<br/>auth='user'"]
+        A4["/woow_snippet/chart<br/>auth='user'"]
+        A5["/woow_snippet/data_table<br/>auth='user'"]
     end
 
     subgraph "Layer 2: Model Whitelist"
@@ -636,23 +636,22 @@ graph TD
 ```
 PUBLIC INTERNET                    SERVER BOUNDARY
 
-  Browser ──────JSON-RPC──────────> [auth check]
+  Browser ──────JSON-RPC──────────> [auth check: logged-in user]
                                        │
                                    [whitelist check]
                                        │
-                                   [safe_eval domain]
+                                   [ast.literal_eval domain]
                                        │
                                    [field filter]
                                        │
-                                   [ORM .sudo()]
+                                   [ORM, user env]
                                        │
                                    [PostgreSQL]
 ```
 
-**Key Design Decision**: Public endpoints use `.sudo()` to bypass Odoo access rules. Security is enforced at the controller layer via the whitelist, NOT via Odoo's record rules. This means:
-- Any model in the whitelist is queryable by anonymous users
-- The whitelist is the sole gate for public data access
-- Extending the whitelist requires careful security review
+**Key Design Decision** (since 18.0.2.0.1 / 18.0.2.0.2): the data endpoints are `auth='user'` and never use `.sudo()`. Anonymous visitors are refused (the widgets show a sign-in notice); logged-in users only see what their own ACL, record rules and field `groups` allow. The whitelist (see `_DEFAULT_ALLOWED_MODELS` in `controllers/main.py`; the table above is the historical 18.0.2.0.0 list) is an additional gate:
+- Contacts, users, companies, HR, accounting, etc. are not queryable even by internal users
+- Extending the whitelist still requires a security review
 
 ---
 
@@ -678,7 +677,7 @@ graph LR
     end
 
     subgraph "XML Data"
-        D1["data/woow_snippet_filter_data.xml"]
+        D1["demo/woow_snippet_filter_demo.xml"]
         D2["data/woow_dynamic_filter_templates.xml"]
     end
 
@@ -767,7 +766,7 @@ graph LR
 | **woow_dynamic_content options** | `s_woow_dynamic_content/options.js` | Removes model filter restriction from native dynamic snippet options | `modelNameFilter: undefined` |
 | **snippets.xml** | `views/snippets/snippets.xml` | Registers "WoOW Dynamic" group in BLOCKS panel with 4 entries | N/A (declarative XML) |
 | **QWeb Templates** | `data/woow_dynamic_filter_templates.xml` | 6 rendering themes for dynamic content | `woow_tmpl_card`, `woow_tmpl_list`, `woow_tmpl_hero`, `woow_tmpl_compact`, `woow_tmpl_table`, `woow_tmpl_timeline` |
-| **Demo Filters** | `data/woow_snippet_filter_data.xml` | Seed data: 2 `ir.filters` + 2 `website.snippet.filter` records | N/A (data XML) |
+| **Demo Filters** | `demo/woow_snippet_filter_demo.xml` | Seed data: 2 `ir.filters` + 2 `website.snippet.filter` records | N/A (data XML) |
 | **_safe_domain** | `controllers/main.py` | Parses domain strings safely using `safe_eval` | Returns `[]` on failure |
 | **COLORS palette** | `s_woow_chart/000.js` | 15-color array for chart dataset styling | `['#3B82F6', '#10B981', ...]` |
 
@@ -1344,8 +1343,9 @@ woow_snippet_builder/
 |   |-- __init__.py
 |   `-- main.py                          # 5 RPC endpoints + whitelist
 |-- data/
-|   |-- woow_dynamic_filter_templates.xml  # 6 QWeb templates
-|   `-- woow_snippet_filter_data.xml       # Demo ir.filters + snippet.filter
+|   `-- woow_dynamic_filter_templates.xml  # 6 QWeb templates
+|-- demo/
+|   `-- woow_snippet_filter_demo.xml       # Demo ir.filters + snippet.filter
 |-- models/
 |   |-- __init__.py
 |   `-- website_snippet_filter.py         # _render override + generic mapping

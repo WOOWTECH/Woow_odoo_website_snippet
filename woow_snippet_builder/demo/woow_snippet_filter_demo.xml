@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
 
+    <!-- Demo only (moved out of 'data' in 18.0.2.0.1): the records are
+         rendered with the visitor's own access rights, so anonymous visitors
+         only see the contacts the core record rules let them read. -->
+
     <!-- Demo ir.filters record for res.partner -->
     <record id="woow_filter_partners" model="ir.filters">
         <field name="name">All Contacts</field>

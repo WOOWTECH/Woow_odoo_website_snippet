@@ -333,3 +333,22 @@ msgstr "所有公司"
 #: model:website.snippet.filter,name:woow_snippet_builder.woow_snippet_filter_companies
 msgid "Companies"
 msgstr "公司"
+
+#. module: woow_snippet_builder
+#. odoo-javascript
+#: code:addons/woow_snippet_builder/static/src/snippets/woow_snippet_access.js:0
+msgid "Sign in to view this content."
+msgstr "請登入以檢視此內容。"
+
+#. module: woow_snippet_builder
+#. odoo-javascript
+#: code:addons/woow_snippet_builder/static/src/snippets/woow_snippet_access.js:0
+msgid "Sign in"
+msgstr "登入"
+
+#. module: woow_snippet_builder
+#. odoo-python
+#: code:addons/woow_snippet_builder/models/website_snippet_filter.py:0
+msgid ""
+"Only administrators can bind a dynamic snippet filter to a server action."
+msgstr "只有系統管理員可以將動態元件篩選器綁定到伺服器動作。"

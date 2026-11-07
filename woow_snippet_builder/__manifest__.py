@@ -1,6 +1,6 @@
 {
     'name': 'WoOW Snippet Builder',
-    'version': '18.0.2.0.0',
+    'version': '18.0.2.0.2',
     'category': 'Website',
     'summary': 'Dynamic website snippets with native editor integration',
     'description': """
@@ -24,7 +24,9 @@ navigation required.
     'website': 'https://woowtech.com',
     'depends': ['website'],
     'data': [
-        'data/woow_snippet_filter_data.xml',
+        # Only the website designer CRUD row on website.snippet.filter (the
+        # public read row of 18.0.2.0.0 is gone and removed on upgrade).
+        'security/ir.model.access.csv',
         'data/woow_dynamic_filter_templates.xml',
         'views/snippets/snippets.xml',
         'views/snippets/s_woow_dynamic_content.xml',
@@ -33,8 +35,12 @@ navigation required.
         'views/snippets/s_woow_data_table.xml',
         'views/ha_dashboard.xml',
     ],
+    'demo': [
+        'demo/woow_snippet_filter_demo.xml',
+    ],
     'assets': {
         'web.assets_frontend': [
+            'woow_snippet_builder/static/src/snippets/woow_snippet_access.js',
             'woow_snippet_builder/static/src/snippets/s_woow_dynamic_content/000.js',
             'woow_snippet_builder/static/src/snippets/s_woow_stat/000.js',
             'woow_snippet_builder/static/src/snippets/s_woow_chart/000.js',
