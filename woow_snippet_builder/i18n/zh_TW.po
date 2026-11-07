@@ -333,3 +333,15 @@ msgstr "所有公司"
 #: model:website.snippet.filter,name:woow_snippet_builder.woow_snippet_filter_companies
 msgid "Companies"
 msgstr "公司"
+
+#. module: woow_snippet_builder
+#. odoo-javascript
+#: code:addons/woow_snippet_builder/static/src/snippets/woow_snippet_access.js:0
+msgid "Sign in to view this content."
+msgstr "請登入以檢視此內容。"
+
+#. module: woow_snippet_builder
+#. odoo-javascript
+#: code:addons/woow_snippet_builder/static/src/snippets/woow_snippet_access.js:0
+msgid "Sign in"
+msgstr "登入"

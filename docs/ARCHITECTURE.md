@@ -83,7 +83,7 @@ graph TB
     B -->|"data-* attrs"| C
     B -->|"data-* attrs"| D
     E -->|"RPC auth=user"| F
-    C -->|"RPC auth=public"| F
+    C -->|"RPC auth=user"| F
     D -->|"Native /s_dynamic"| H
     F -->|"Whitelist check"| G
     F -->|"ORM calls"| L
@@ -113,7 +113,7 @@ graph TB
 | 1 | XML Views | N/A (server data) | N/A | Defines snippet bodies, BLOCKS registration, CUSTOMIZE panels |
 | 2 | Frontend JS | `web.assets_frontend` | Public | Renders live widgets on published pages |
 | 3 | Editor JS | `website.assets_wysiwyg` | User (editor) | Populates CUSTOMIZE panel selects, triggers preview refresh |
-| 4 | Python Controller | N/A (server) | Mixed | 2 `auth='user'` + 3 `auth='public'` endpoints |
+| 4 | Python Controller | N/A (server) | Mixed | 5 `auth='user'` endpoints (2 editor + 3 data) |
 | 5 | Python Model | N/A (server) | Sudo | Extends `website.snippet.filter` for generic rendering |
 | 6 | Data Layer | N/A (server data) | N/A | QWeb templates + demo `ir.filters` records |
 
@@ -555,9 +555,9 @@ graph TD
     subgraph "Layer 1: Authentication"
         A1["/woow_snippet/available_models<br/>auth='user'"]
         A2["/woow_snippet/model_fields<br/>auth='user'"]
-        A3["/woow_snippet/stat<br/>auth='public'"]
-        A4["/woow_snippet/chart<br/>auth='public'"]
-        A5["/woow_snippet/data_table<br/>auth='public'"]
+        A3["/woow_snippet/stat<br/>auth='user'"]
+        A4["/woow_snippet/chart<br/>auth='user'"]
+        A5["/woow_snippet/data_table<br/>auth='user'"]
     end
 
     subgraph "Layer 2: Model Whitelist"
@@ -636,23 +636,22 @@ graph TD
 ```
 PUBLIC INTERNET                    SERVER BOUNDARY
 
-  Browser ──────JSON-RPC──────────> [auth check]
+  Browser ──────JSON-RPC──────────> [auth check: logged-in user]
                                        │
                                    [whitelist check]
                                        │
-                                   [safe_eval domain]
+                                   [ast.literal_eval domain]
                                        │
                                    [field filter]
                                        │
-                                   [ORM .sudo()]
+                                   [ORM, user env]
                                        │
                                    [PostgreSQL]
 ```
 
-**Key Design Decision**: Public endpoints use `.sudo()` to bypass Odoo access rules. Security is enforced at the controller layer via the whitelist, NOT via Odoo's record rules. This means:
-- Any model in the whitelist is queryable by anonymous users
-- The whitelist is the sole gate for public data access
-- Extending the whitelist requires careful security review
+**Key Design Decision** (since 18.0.2.0.1 / 18.0.2.0.2): the data endpoints are `auth='user'` and never use `.sudo()`. Anonymous visitors are refused (the widgets show a sign-in notice); logged-in users only see what their own ACL, record rules and field `groups` allow. The whitelist (see `_DEFAULT_ALLOWED_MODELS` in `controllers/main.py`; the table above is the historical 18.0.2.0.0 list) is an additional gate:
+- Contacts, users, companies, HR, accounting, etc. are not queryable even by internal users
+- Extending the whitelist still requires a security review
 
 ---
 

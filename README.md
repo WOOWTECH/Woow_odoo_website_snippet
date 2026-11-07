@@ -657,10 +657,14 @@ The Dynamic Content snippet relies on `website.snippet.filter` records. Two are 
 
 ### Model Whitelist
 
-Since 18.0.2.0.1 the public endpoints **never use `sudo()`**: every query runs
-with the visitor's own access rights (ACL, record rules, field `groups`). On
-top of that, they only accept the website-oriented models of
-`_DEFAULT_ALLOWED_MODELS` (models that are not installed are ignored):
+Since 18.0.2.0.2 the Stat Card, Chart and Data Table data endpoints require a
+logged-in user (`auth='user'`, as on the production site): anonymous visitors
+get the regular session-expired JSON-RPC error and the widgets show a
+"Sign in to view this content." notice instead of data. Since 18.0.2.0.1 the
+endpoints **never use `sudo()`**: every query runs with the logged-in user's
+own access rights (ACL, record rules, field `groups`). On top of that, they
+only accept the website-oriented models of `_DEFAULT_ALLOWED_MODELS` (models
+that are not installed are ignored):
 
 ```
 product.template    product.product      product.public.category
@@ -694,7 +698,9 @@ class CustomSnippetController(WoowSnippetController):
 
 | Layer | Mechanism |
 |:------|:----------|
-| **Visitor rights** | Public endpoints and Dynamic Content search with the visitor's environment (no `sudo()`); ACL and record rules apply |
+| **Login** | `/woow_snippet/stat`, `/chart` and `/data_table` are `auth='user'` + `readonly=True`; anonymous callers are refused (session-expired error), the widgets render a sign-in notice |
+| **User rights** | The data endpoints and Dynamic Content search with the current user's environment (no `sudo()`); ACL and record rules apply (e.g. portal users only see published products) |
+| **Snippet filters** | `security/ir.model.access.csv` grants `website.group_website_designer` full access to `website.snippet.filter` (Dynamic Content filters); there is no public read access (core renders filters with `sudo()`) |
 | **Whitelist** | `_validate_model()` checks the model name against `_get_allowed_models()` |
 | **Fields** | Fields must exist, must not carry a `groups` restriction and must be stored when used for domains, grouping, aggregation or sorting |
 | **Domain parsing** | `ast.literal_eval()` only; leaves `(field, operator, value)` plus `&`, `|`, `!`; no dotted paths; operators `= != > >= < <= in not in ilike like`; relational fields compare ids only |

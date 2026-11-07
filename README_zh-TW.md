@@ -632,7 +632,7 @@ cp -r woow_snippet_builder /path/to/odoo/custom-addons/
 
 ### 模型白名單
 
-自 18.0.2.0.1 起，公開端點**不再使用 `sudo()`**：所有查詢都以訪客自己的權限執行（ACL、記錄規則、欄位 `groups`）。此外只接受 `_DEFAULT_ALLOWED_MODELS` 中以網站展示為目的的模型（未安裝的模型自動忽略）：
+自 18.0.2.0.2 起，統計卡、圖表、資料表格的資料端點需要登入（`auth='user'`，與正式站一致）：未登入訪客會收到一般的「session 過期」JSON-RPC 錯誤，元件改顯示「請登入以檢視此內容。」提示而不顯示資料。自 18.0.2.0.1 起，這些端點**不再使用 `sudo()`**：所有查詢都以登入使用者自己的權限執行（ACL、記錄規則、欄位 `groups`）。此外只接受 `_DEFAULT_ALLOWED_MODELS` 中以網站展示為目的的模型（未安裝的模型自動忽略）：
 
 | 類別 | 模型 |
 |------|------|
@@ -647,13 +647,15 @@ cp -r woow_snippet_builder /path/to/odoo/custom-addons/
 
 | 安全層面 | 實作方式 |
 |----------|----------|
-| **資料讀取** | 公開端點與動態內容都以訪客環境查詢（不使用 `sudo()`），ACL 與記錄規則都生效 |
-| **模型存取控制** | 白名單機制 — 僅 `_get_allowed_models()` 內的模型可透過公開端點查詢 |
+| **登入** | `/woow_snippet/stat`、`/chart`、`/data_table` 為 `auth='user'` + `readonly=True`；未登入一律拒絕（session 過期錯誤），元件顯示登入提示 |
+| **資料讀取** | 資料端點與動態內容都以目前使用者的環境查詢（不使用 `sudo()`），ACL 與記錄規則都生效（例如入口網站使用者只看得到已發佈產品） |
+| **動態內容篩選器** | `security/ir.model.access.csv` 給 `website.group_website_designer` 管理 `website.snippet.filter` 的完整權限；不給公開讀取權限（core 以 `sudo()` 渲染篩選器） |
+| **模型存取控制** | 白名單機制 — 僅 `_get_allowed_models()` 內的模型可透過資料端點查詢 |
 | **欄位** | 欄位必須存在、不可帶 `groups` 限制；用於 domain、分組、聚合、排序時必須是 stored 欄位 |
 | **Domain 解析** | 只用 `ast.literal_eval`；只接受 `(欄位, 運算子, 值)` 與 `&`、`|`、`!`；禁止點號路徑；運算子限 `= != > >= < <= in not in ilike like`；關聯欄位只能比對 id |
 | **動態內容** | 訪客的 `search_domain` 只能用 filter 的 `field_names`；比照 core 加上網站、公司、`is_published` 限制；封存的 `ir.filters` 不再對外提供 |
 | **上限** | 分組最多 50 組、每頁最多 100 筆；數值參數會驗證（忽略 `nan`／`inf`） |
-| **端點分離** | 編輯器端點需 `website.group_website_restricted_editor`；資料端點 `auth='public'` + `readonly=True` |
+| **端點分離** | 編輯器端點需 `website.group_website_restricted_editor`；資料端點 `auth='user'` + `readonly=True` |
 | **XSS 防護** | 統計卡、資料表格、圖表寫入 DOM 的值全部轉義（`_escapeHtml()`／`textContent`） |
 | **擴展機制** | 可覆寫 `_get_allowed_models()` 方法自訂白名單 |
 
@@ -738,7 +740,7 @@ POST /woow_snippet/model_fields
 
 ---
 
-### 公開資料端點（auth='public'）
+### 資料端點（auth='user'，需登入）
 
 #### 統計資料
 

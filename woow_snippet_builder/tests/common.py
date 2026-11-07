@@ -24,3 +24,12 @@ class WoowSnippetHttpCase(HttpCase):
     def assertResult(self, response):
         self.assertNotIn('error', response, response.get('error'))
         return response['result']
+
+    def assertLoginRequired(self, response, msg=None):
+        """The auth='user' data routes answer anonymous calls with the
+        regular JSON-RPC session-expired error (code 100), no data."""
+        self.assertRefused(response, msg)
+        error = response['error']
+        self.assertEqual(error.get('code'), 100, msg or error)
+        self.assertEqual(error.get('data', {}).get('name'),
+                         'odoo.http.SessionExpiredException', msg or error)

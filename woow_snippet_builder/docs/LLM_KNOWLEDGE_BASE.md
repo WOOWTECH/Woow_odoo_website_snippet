@@ -42,7 +42,7 @@ asset_bundles:
 ### 1.2 Anti-Features / Boundaries
 
 - No new Odoo models are defined; only `website.snippet.filter` is inherited
-- No access control (ir.model.access, ir.rule) records shipped; relies on `.sudo()` for public reads
+- Ships `security/ir.model.access.csv`: website designers manage `website.snippet.filter`; no public ACL. Data endpoints are `auth='user'` and never use `.sudo()`
 - No CSS/SCSS files; all styling uses Bootstrap 5 utility classes
 - No backend views (menus, actions, forms, trees)
 - No cron jobs, mail templates, or workflow automations
@@ -253,9 +253,9 @@ def _filter_records_to_values(self, records, is_sample=False):
 |-------|------|---------------|--------|
 | `/woow_snippet/available_models` | `user` | Website editor (CUSTOMIZE panel) | Only logged-in editors should list available models |
 | `/woow_snippet/model_fields` | `user` | Website editor (CUSTOMIZE panel) | Only logged-in editors should introspect field metadata |
-| `/woow_snippet/stat` | `public` | Frontend widget (anonymous visitors) | Stat cards render on public pages |
-| `/woow_snippet/chart` | `public` | Frontend widget (anonymous visitors) | Charts render on public pages |
-| `/woow_snippet/data_table` | `public` | Frontend widget (anonymous visitors) | Data tables render on public pages |
+| `/woow_snippet/stat` | `user` | Frontend widget (logged-in users; anonymous visitors see a sign-in notice) | Stat cards render on public pages |
+| `/woow_snippet/chart` | `user` | Frontend widget (logged-in users; anonymous visitors see a sign-in notice) | Charts render on public pages |
+| `/woow_snippet/data_table` | `user` | Frontend widget (logged-in users; anonymous visitors see a sign-in notice) | Data tables render on public pages |
 
 All public routes have `readonly=True`.
 
@@ -356,7 +356,7 @@ Returns only models that (a) are in the whitelist AND (b) exist in `request.env`
 
 **Errors:** `ValueError` if model not in whitelist or not installed.
 
-### 4.2 Public Data Endpoints (auth=public)
+### 4.2 Data Endpoints (auth=user since 18.0.2.0.2)
 
 #### 4.2.1 Stat Card Data
 
@@ -364,7 +364,7 @@ Returns only models that (a) are in the whitelist AND (b) exist in `request.env`
 |----------|-------|
 | Route | `/woow_snippet/stat` |
 | Type | `json` |
-| Auth | `public` |
+| Auth | `user` |
 | Website | `True` |
 | Readonly | `True` |
 
@@ -431,7 +431,7 @@ Returns only models that (a) are in the whitelist AND (b) exist in `request.env`
 |----------|-------|
 | Route | `/woow_snippet/chart` |
 | Type | `json` |
-| Auth | `public` |
+| Auth | `user` |
 | Website | `True` |
 | Readonly | `True` |
 
@@ -486,7 +486,7 @@ Returns only models that (a) are in the whitelist AND (b) exist in `request.env`
 |----------|-------|
 | Route | `/woow_snippet/data_table` |
 | Type | `json` |
-| Auth | `public` |
+| Auth | `user` |
 | Website | `True` |
 | Readonly | `True` |
 
@@ -1058,7 +1058,7 @@ Set `data-series-field` (via the "Series Field" dropdown in CUSTOMIZE panel) to 
 | `__init__.py` | Imports `controllers` and `models` packages |
 | `__manifest__.py` | Module metadata, dependencies, data files, asset declarations |
 | `controllers/__init__.py` | Imports `main` |
-| `controllers/main.py` | 5 JSON-RPC routes: 2 editor (auth=user) + 3 public (auth=public); model whitelist; domain parsing |
+| `controllers/main.py` | 5 JSON-RPC routes: 2 editor (auth=user) + 3 data (auth=user); model whitelist; domain parsing |
 | `models/__init__.py` | Imports `website_snippet_filter` |
 | `models/website_snippet_filter.py` | Inherits `website.snippet.filter`; overrides `_render`, `_filter_records_to_values`; adds `_woow_prepare_values` |
 | `static/src/snippets/s_woow_dynamic_content/000.js` | Frontend widget extending DynamicSnippet; context/URL param filtering |
@@ -1186,9 +1186,9 @@ Only `website` module is required. All other models in the whitelist (e.g., `sal
 
 Chart.js is loaded from Odoo's bundled library at `/web/static/lib/Chart/Chart.js`. No external CDN calls are made. The `s_woow_chart` widget loads it lazily via `loadJS()` only when a chart needs to render.
 
-### 10.4 Public Access
+### 10.4 Access
 
-All public endpoints use `.sudo()` to bypass ACL. The model whitelist (`_DEFAULT_ALLOWED_MODELS`) is the security boundary. If a model is removed from the whitelist, its data becomes inaccessible through all snippet endpoints.
+The data endpoints are `auth='user'` (anonymous visitors get a session-expired error; the widgets show a sign-in notice) and never use `.sudo()`: the logged-in user's ACL and record rules apply. The model whitelist (`_DEFAULT_ALLOWED_MODELS`) is an additional restriction. If a model is removed from the whitelist, its data becomes inaccessible through all snippet endpoints.
 
 ---
 
@@ -1279,9 +1279,9 @@ All public endpoints use `.sudo()` to bypass ACL. The model whitelist (`_DEFAULT
 |----------|------|-----------|---------|
 | `/woow_snippet/available_models` | user | (none) | `[{model, name}]` |
 | `/woow_snippet/model_fields` | user | `model_name` | `[{name, string, type}]` |
-| `/woow_snippet/stat` | public | `model_name, operation, field_name, group_by, domain, sub_type, target_value, threshold_warning, threshold_danger, previous_value` | `{value, sub_type, breakdown[], ...}` |
-| `/woow_snippet/chart` | public | `model_name, chart_type, label_field, value_field, domain, gauge_max, series_field` | `{labels[], datasets[], chart_type, gauge_max}` |
-| `/woow_snippet/data_table` | public | `model_name, field_names, domain, offset, limit, sort_field, sort_order, search_term` | `{columns[], rows[], total, offset, limit}` |
+| `/woow_snippet/stat` | user | `model_name, operation, field_name, group_by, domain, sub_type, target_value, threshold_warning, threshold_danger, previous_value` | `{value, sub_type, breakdown[], ...}` |
+| `/woow_snippet/chart` | user | `model_name, chart_type, label_field, value_field, domain, gauge_max, series_field` | `{labels[], datasets[], chart_type, gauge_max}` |
+| `/woow_snippet/data_table` | user | `model_name, field_names, domain, offset, limit, sort_field, sort_order, search_term` | `{columns[], rows[], total, offset, limit}` |
 
 ### 11.4 Chart Type to Chart.js Type Mapping
 

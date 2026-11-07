@@ -2,7 +2,7 @@ import importlib.util
 import os
 
 from odoo.modules.module import get_module_path
-from odoo.tests import TransactionCase, tagged
+from odoo.tests import TransactionCase, new_test_user, tagged
 
 from .common import WoowSnippetHttpCase
 
@@ -59,7 +59,62 @@ class TestDynamicFilterPublic(WoowSnippetHttpCase):
             'key,value')
         self.assertEqual(self._render(snippet_filter), [])
 
+    def test_search_domain_rejected(self):
+        """Install-independent (website.menu is readable by the public
+        user): only plain leaves on the configured fields are accepted."""
+        self.env['website.menu'].create({
+            'name': 'WoowDyn Menu', 'url': '/woowdyn-menu',
+            'website_id': self.env['website'].get_current_website().id,
+        })
+        snippet_filter = _make_filter(
+            self.env, 'website.menu', "[('url', '=', '/woowdyn-menu')]",
+            'name,url')
+        self.assertIn('WoowDyn Menu', ''.join(self._render(snippet_filter)))
+        self.assertIn('WoowDyn Menu', ''.join(self._render(
+            snippet_filter, [['name', '=', 'WoowDyn Menu']])))
+        for search_domain in (
+            [['create_uid.login', 'like', '%']],
+            [['website_id.company_id.email', '!=', False]],
+            [['create_uid', '!=', False]],          # not in field_names
+            [['name', '=like', 'Woow%']],           # operator not allowed
+            'not a domain',
+        ):
+            with self.subTest(search_domain=search_domain):
+                resp = self._rpc('/website/snippet/filters',
+                                 filter_id=snippet_filter.id,
+                                 template_key=CARD, limit=16,
+                                 search_domain=search_domain)
+                self.assertEqual(self.assertResult(resp), [])
+
+    def test_unpublished_records_not_rendered(self):
+        """Install-independent: a designer may read unpublished website
+        pages through the ORM, the snippet still only renders published
+        records."""
+        Page = self.env['website.page']
+        for published in (True, False):
+            label = 'Published' if published else 'Hidden'
+            Page.create({
+                'name': f'WoowDyn Page {label}', 'type': 'qweb',
+                'arch': '<div/>', 'url': f'/woowdyn-page-{label.lower()}',
+                'key': f'woow_snippet_builder.woowdyn_page_{label.lower()}',
+                'is_published': published,
+            })
+        snippet_filter = _make_filter(
+            self.env, 'website.page', "[('url', 'like', '/woowdyn-page-')]",
+            'url')
+        new_test_user(self.env, login='woowdyn_designer',
+                      groups='base.group_user,website.group_website_designer')
+        self.authenticate('woowdyn_designer', 'woowdyn_designer')
+        html = ''.join(self._render(snippet_filter))
+        self.assertIn('/woowdyn-page-published', html)
+        self.assertNotIn('/woowdyn-page-hidden', html)
+        # anonymous visitors have no ACL on website.page: nothing
+        self.authenticate(None, None)
+        self.assertEqual(self._render(snippet_filter), [])
+
     def test_products_and_search_domain(self):
+        # Needs website_sale: ``website`` has no product model and
+        # ``is_published`` on product.template comes from website_sale.
         if 'product.template' not in self.env \
                 or 'is_published' not in self.env['product.template']:
             self.skipTest('website_sale not installed')

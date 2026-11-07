@@ -1,6 +1,7 @@
 /** @odoo-module */
 import publicWidget from "@web/legacy/js/public/public_widget";
 import { rpc } from "@web/core/network/rpc";
+import { isAnonymousVisitor, isLoginRequiredError, renderLoginRequired } from "@woow_snippet_builder/snippets/woow_snippet_access";
 import { loadJS } from "@web/core/assets";
 
 // Palette used for chart datasets
@@ -58,6 +59,11 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
             this._renderPlaceholder();
             return;
         }
+        if (isAnonymousVisitor()) {
+            // The data route requires a logged-in user (auth='user').
+            this._renderLoginRequired();
+            return;
+        }
 
         try {
             const result = await rpc('/woow_snippet/chart', {
@@ -71,8 +77,16 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
             });
             await this._renderChart(result);
         } catch (err) {
-            this._renderError(err);
+            if (isLoginRequiredError(err)) {
+                this._renderLoginRequired();
+            } else {
+                this._renderError(err);
+            }
         }
+    },
+
+    _renderLoginRequired() {
+        renderLoginRequired(this.el.querySelector('.woow_chart_content'), 'fa-pie-chart');
     },
 
     _renderPlaceholder() {

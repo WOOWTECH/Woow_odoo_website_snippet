@@ -1,6 +1,7 @@
 /** @odoo-module */
 import publicWidget from "@web/legacy/js/public/public_widget";
 import { rpc } from "@web/core/network/rpc";
+import { isAnonymousVisitor, isLoginRequiredError, renderLoginRequired } from "@woow_snippet_builder/snippets/woow_snippet_access";
 
 /**
  * WoOW Data Table — renders a paginated, searchable, sortable data table.
@@ -89,6 +90,11 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
             this._renderPlaceholder();
             return;
         }
+        if (isAnonymousVisitor()) {
+            // The data route requires a logged-in user (auth='user').
+            this._renderLoginRequired();
+            return;
+        }
 
         try {
             const result = await rpc('/woow_snippet/data_table', {
@@ -103,8 +109,16 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
             });
             this._renderTable(result, ds);
         } catch (err) {
-            this._renderError(err);
+            if (isLoginRequiredError(err)) {
+                this._renderLoginRequired();
+            } else {
+                this._renderError(err);
+            }
         }
+    },
+
+    _renderLoginRequired() {
+        renderLoginRequired(this.el.querySelector('.woow_data_table_content'), 'fa-table');
     },
 
     _renderPlaceholder() {

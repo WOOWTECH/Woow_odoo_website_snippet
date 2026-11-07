@@ -14,10 +14,13 @@ from ..tools.snippet_guard import (
 
 _logger = logging.getLogger(__name__)
 
-# Models that the public snippet endpoints may query.  The endpoints never
-# use sudo: the visitor's own access rights (ACL + record rules + field
-# groups) always apply, this list is only an additional allow-list so that
-# the endpoints cannot be pointed at arbitrary models.  Keep it to models
+# Models that the snippet data endpoints may query.  The endpoints require
+# a logged-in user (``auth='user'``, like the version well-101 runs: anonymous
+# visitors get the regular session-expired JSON error and the front-end
+# widgets show a sign-in notice) and never use sudo: the user's own access
+# rights (ACL + record rules + field groups) always apply, this list is only
+# an additional allow-list so that the endpoints cannot be pointed at
+# arbitrary models.  Keep it to models
 # that are meant to be shown on a website.  Extend it via
 # ``_get_allowed_models`` on a custom controller if you really need more.
 _DEFAULT_ALLOWED_MODELS = frozenset({
@@ -71,7 +74,7 @@ class WoowSnippetController(http.Controller):
 
     def _get_allowed_models(self):
         """Return the set of model technical names that may be queried by
-        the public snippet endpoints.  Override to extend (the returned
+        the snippet data endpoints.  Override to extend (the returned
         set may be modified by overrides)."""
         return set(_DEFAULT_ALLOWED_MODELS)
 
@@ -84,7 +87,7 @@ class WoowSnippetController(http.Controller):
             raise UserError(f'Model {model_name!r} does not exist')
 
     def _get_model(self, model_name):
-        """Validated model in the *visitor's* environment (never sudo).
+        """Validated model in the *current user's* environment (never sudo).
 
         Raises :class:`AccessError` when the visitor may not read it.
         """
@@ -123,7 +126,7 @@ class WoowSnippetController(http.Controller):
     @http.route('/woow_snippet/model_fields', type='json', auth='user',
                 website=True)
     def get_model_fields(self, model_name):
-        """Return the fields of *model_name* the public endpoints accept.
+        """Return the fields of *model_name* the data endpoints accept.
 
         Each entry is ``{'name': 'field_name', 'string': 'Field Label',
         'type': 'char'}``.
@@ -147,10 +150,10 @@ class WoowSnippetController(http.Controller):
         return result
 
     # ------------------------------------------------------------------
-    # Public data endpoints (auth='public', visitor environment)
+    # Data endpoints (auth='user', logged-in user's own environment)
     # ------------------------------------------------------------------
 
-    @http.route('/woow_snippet/stat', type='json', auth='public',
+    @http.route('/woow_snippet/stat', type='json', auth='user',
                 website=True, readonly=True)
     def get_stat(self, model_name, operation='count', field_name='',
                  group_by='', domain='[]', sub_type='default',
@@ -227,7 +230,7 @@ class WoowSnippetController(http.Controller):
 
         return result
 
-    @http.route('/woow_snippet/chart', type='json', auth='public',
+    @http.route('/woow_snippet/chart', type='json', auth='user',
                 website=True, readonly=True)
     def get_chart(self, model_name, chart_type='bar', label_field='',
                   value_field='', domain='[]', gauge_max=100,
@@ -314,7 +317,7 @@ class WoowSnippetController(http.Controller):
             'gauge_max': gauge_max,
         }
 
-    @http.route('/woow_snippet/data_table', type='json', auth='public',
+    @http.route('/woow_snippet/data_table', type='json', auth='user',
                 website=True, readonly=True)
     def get_data_table(self, model_name, field_names='', domain='[]',
                        offset=0, limit=25, sort_field='', sort_order='asc',

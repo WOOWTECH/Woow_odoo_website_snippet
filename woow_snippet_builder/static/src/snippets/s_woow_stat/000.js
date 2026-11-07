@@ -1,6 +1,7 @@
 /** @odoo-module */
 import publicWidget from "@web/legacy/js/public/public_widget";
 import { rpc } from "@web/core/network/rpc";
+import { isAnonymousVisitor, isLoginRequiredError, renderLoginRequired } from "@woow_snippet_builder/snippets/woow_snippet_access";
 
 /**
  * WoOW Stat Card — renders an aggregated KPI value with optional
@@ -50,6 +51,11 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
             this._renderPlaceholder();
             return;
         }
+        if (isAnonymousVisitor()) {
+            // The data route requires a logged-in user (auth='user').
+            this._renderLoginRequired();
+            return;
+        }
 
         try {
             const result = await rpc('/woow_snippet/stat', {
@@ -66,8 +72,16 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
             });
             this._renderStat(result);
         } catch (err) {
-            this._renderError(err);
+            if (isLoginRequiredError(err)) {
+                this._renderLoginRequired();
+            } else {
+                this._renderError(err);
+            }
         }
+    },
+
+    _renderLoginRequired() {
+        renderLoginRequired(this.el.querySelector('.woow_stat_content'), 'fa-bar-chart');
     },
 
     _renderPlaceholder() {
