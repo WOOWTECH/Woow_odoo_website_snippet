@@ -87,7 +87,7 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
             el.innerHTML = `
                 <div class="text-center text-danger py-4">
                     <i class="fa fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                    <small>${err.message || 'Error loading data'}</small>
+                    <small>${this._escapeHtml((err && err.message) || 'Error loading data')}</small>
                 </div>`;
         }
     },
@@ -96,12 +96,16 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
         const el = this.el.querySelector('.woow_stat_content');
         if (!el) return;
 
-        const value = this._formatNumber(result.value);
+        // Every value interpolated into the HTML below is escaped: labels
+        // come from database values (group-by labels) or data-* attributes.
+        const value = this._escapeHtml(this._formatNumber(result.value));
         const ds = this.el.dataset;
         const customTitle = ds.title || '';
         const operation = ds.operation || 'count';
         const modelName = (ds.modelName || '').replace(/\./g, ' ');
-        const label = customTitle || `${operation.charAt(0).toUpperCase() + operation.slice(1)} of ${modelName}`;
+        const label = this._escapeHtml(
+            customTitle || `${operation.charAt(0).toUpperCase() + operation.slice(1)} of ${modelName}`
+        );
 
         let html = '';
         switch (result.sub_type) {
@@ -135,7 +139,7 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
     },
 
     _renderProgress(value, result, label) {
-        const pct = Math.min(result.percent || 0, 100);
+        const pct = this._toPercent(result.percent);
         return `
             <div class="text-center py-3">
                 <div class="display-4 fw-bold text-primary">${value}</div>
@@ -146,13 +150,13 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
                          aria-valuenow="${pct}" aria-valuemin="0"
                          aria-valuemax="100"></div>
                 </div>
-                <small class="text-muted">${pct}% of ${this._formatNumber(result.target)}</small>
+                <small class="text-muted">${pct}% of ${this._escapeHtml(this._formatNumber(result.target))}</small>
             </div>`;
     },
 
     _renderTrend(value, result, label) {
         const delta = result.delta || 0;
-        const deltaPct = result.delta_percent || 0;
+        const deltaPct = this._escapeHtml(String(Number(result.delta_percent) || 0));
         const isPositive = delta >= 0;
         const icon = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
         const color = isPositive ? 'text-success' : 'text-danger';
@@ -162,14 +166,14 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
                 <div class="text-muted mt-1">${label}</div>
                 <div class="mt-2 ${color}">
                     <i class="fa ${icon} me-1"></i>
-                    <span class="fw-bold">${isPositive ? '+' : ''}${this._formatNumber(delta)}</span>
+                    <span class="fw-bold">${isPositive ? '+' : ''}${this._escapeHtml(this._formatNumber(delta))}</span>
                     <span class="small">(${isPositive ? '+' : ''}${deltaPct}%)</span>
                 </div>
             </div>`;
     },
 
     _renderThreshold(value, result, label) {
-        const pct = Math.min(result.percent || 0, 100);
+        const pct = this._toPercent(result.percent);
         const status = result.status || 'success';
         const colorMap = {success: 'bg-success', warning: 'bg-warning', danger: 'bg-danger'};
         const barClass = colorMap[status] || 'bg-primary';
@@ -192,11 +196,26 @@ publicWidget.registry.s_woow_stat = publicWidget.Widget.extend({
         for (const item of breakdown) {
             rows += `
                 <div class="d-flex justify-content-between py-1 border-bottom">
-                    <span class="text-muted small">${item.label}</span>
-                    <span class="fw-bold small">${this._formatNumber(item.value)}</span>
+                    <span class="text-muted small">${this._escapeHtml(item.label)}</span>
+                    <span class="fw-bold small">${this._escapeHtml(this._formatNumber(item.value))}</span>
                 </div>`;
         }
         return `<div class="mt-3 mx-auto" style="max-width:300px;">${rows}</div>`;
+    },
+
+    _toPercent(percent) {
+        const n = Number(percent);
+        return Number.isFinite(n) ? Math.max(0, Math.min(n, 100)) : 0;
+    },
+
+    _escapeHtml(str) {
+        if (str === undefined || str === null || str === false) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     },
 
     _formatNumber(num) {

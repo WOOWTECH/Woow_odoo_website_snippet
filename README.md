@@ -341,8 +341,10 @@ woow_snippet_builder/
 │   └── website_snippet_filter.py            # _render() / _woow_prepare_values() / _filter_records_to_values()
 │
 ├── data/
-│   ├── woow_dynamic_filter_templates.xml    # 6 QWeb templates (Card, List, Hero, Compact, Table, Timeline)
-│   └── woow_snippet_filter_data.xml         # 2 demo snippet filters (Contacts, Companies)
+│   └── woow_dynamic_filter_templates.xml    # 6 QWeb templates (Card, List, Hero, Compact, Table, Timeline)
+│
+├── demo/
+│   └── woow_snippet_filter_demo.xml         # 2 demo snippet filters (Contacts, Companies), demo databases only
 │
 ├── views/
 │   └── snippets/
@@ -655,22 +657,23 @@ The Dynamic Content snippet relies on `website.snippet.filter` records. Two are 
 
 ### Model Whitelist
 
-All public-facing endpoints enforce a **28-model whitelist** defined in `_DEFAULT_ALLOWED_MODELS`:
+Since 18.0.2.0.1 the public endpoints **never use `sudo()`**: every query runs
+with the visitor's own access rights (ACL, record rules, field `groups`). On
+top of that, they only accept the website-oriented models of
+`_DEFAULT_ALLOWED_MODELS` (models that are not installed are ignored):
 
 ```
-res.partner         res.company          res.users
-product.template    product.product      sale.order
-sale.order.line     purchase.order       purchase.order.line
-account.move        account.move.line    stock.picking
-stock.move          project.project      project.task
-hr.employee         hr.department        crm.lead
-helpdesk.ticket     event.event          event.registration
-survey.survey       survey.user_input    fleet.vehicle
-maintenance.request lunch.order          website.page
-blog.post
+product.template    product.product      product.public.category
+event.event         event.type           website.page
+blog.post           slide.channel
+ha.instance  ha.area  ha.device  ha.entity  ha.entity.history
+ha.entity.group  ha.label                (readable only by HA users)
 ```
 
-Any request targeting a model outside this list is rejected with a `ValueError` before any data access occurs.
+Contacts, users, companies, HR, accounting, sales, purchase, stock, CRM,
+project, helpdesk, survey, fleet and maintenance models are no longer
+available. Any request targeting a model outside this list is rejected
+before any data access occurs.
 
 ### Extending the Whitelist
 
@@ -691,11 +694,14 @@ class CustomSnippetController(WoowSnippetController):
 
 | Layer | Mechanism |
 |:------|:----------|
-| **Whitelist** | `_validate_model()` checks model name against `_DEFAULT_ALLOWED_MODELS` |
-| **sudo()** | Public endpoints use `sudo()` to bypass ACL -- whitelist is the access gate |
-| **Editor endpoints** | `/woow_snippet/available_models` and `/woow_snippet/model_fields` require `auth='user'` |
-| **XSS prevention** | Data Table widget escapes all cell values via `_escapeHtml()` (`&`, `<`, `>`, `"`) |
-| **Domain parsing** | `safe_eval()` with restricted globals prevents injection via domain strings |
+| **Visitor rights** | Public endpoints and Dynamic Content search with the visitor's environment (no `sudo()`); ACL and record rules apply |
+| **Whitelist** | `_validate_model()` checks the model name against `_get_allowed_models()` |
+| **Fields** | Fields must exist, must not carry a `groups` restriction and must be stored when used for domains, grouping, aggregation or sorting |
+| **Domain parsing** | `ast.literal_eval()` only; leaves `(field, operator, value)` plus `&`, `|`, `!`; no dotted paths; operators `= != > >= < <= in not in ilike like`; relational fields compare ids only |
+| **Dynamic Content** | Visitor `search_domain` restricted to the filter's `field_names`; website, company and `is_published` restrictions like core; archived `ir.filters` are not served |
+| **Limits** | At most 50 groups (stat breakdown, chart labels), 100 rows per page, numeric parameters validated (`nan`/`inf` ignored) |
+| **Editor endpoints** | `/woow_snippet/available_models` and `/woow_snippet/model_fields` require `website.group_website_restricted_editor` |
+| **XSS prevention** | Stat Card, Data Table and Chart escape every value written to the DOM (`_escapeHtml()` / `textContent`) |
 
 ---
 

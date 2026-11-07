@@ -72,7 +72,7 @@ graph TB
 
     subgraph "Server - Data Layer"
         J[6 QWeb Templates<br/><i>data/woow_dynamic_filter_templates.xml</i>]
-        K[Demo Filters<br/><i>data/woow_snippet_filter_data.xml</i>]
+        K[Demo Filters<br/><i>demo/woow_snippet_filter_demo.xml</i>]
     end
 
     subgraph "Database"
@@ -678,7 +678,7 @@ graph LR
     end
 
     subgraph "XML Data"
-        D1["data/woow_snippet_filter_data.xml"]
+        D1["demo/woow_snippet_filter_demo.xml"]
         D2["data/woow_dynamic_filter_templates.xml"]
     end
 
@@ -767,7 +767,7 @@ graph LR
 | **woow_dynamic_content options** | `s_woow_dynamic_content/options.js` | Removes model filter restriction from native dynamic snippet options | `modelNameFilter: undefined` |
 | **snippets.xml** | `views/snippets/snippets.xml` | Registers "WoOW Dynamic" group in BLOCKS panel with 4 entries | N/A (declarative XML) |
 | **QWeb Templates** | `data/woow_dynamic_filter_templates.xml` | 6 rendering themes for dynamic content | `woow_tmpl_card`, `woow_tmpl_list`, `woow_tmpl_hero`, `woow_tmpl_compact`, `woow_tmpl_table`, `woow_tmpl_timeline` |
-| **Demo Filters** | `data/woow_snippet_filter_data.xml` | Seed data: 2 `ir.filters` + 2 `website.snippet.filter` records | N/A (data XML) |
+| **Demo Filters** | `demo/woow_snippet_filter_demo.xml` | Seed data: 2 `ir.filters` + 2 `website.snippet.filter` records | N/A (data XML) |
 | **_safe_domain** | `controllers/main.py` | Parses domain strings safely using `safe_eval` | Returns `[]` on failure |
 | **COLORS palette** | `s_woow_chart/000.js` | 15-color array for chart dataset styling | `['#3B82F6', '#10B981', ...]` |
 
@@ -1344,8 +1344,9 @@ woow_snippet_builder/
 |   |-- __init__.py
 |   `-- main.py                          # 5 RPC endpoints + whitelist
 |-- data/
-|   |-- woow_dynamic_filter_templates.xml  # 6 QWeb templates
-|   `-- woow_snippet_filter_data.xml       # Demo ir.filters + snippet.filter
+|   `-- woow_dynamic_filter_templates.xml  # 6 QWeb templates
+|-- demo/
+|   `-- woow_snippet_filter_demo.xml       # Demo ir.filters + snippet.filter
 |-- models/
 |   |-- __init__.py
 |   `-- website_snippet_filter.py         # _render override + generic mapping

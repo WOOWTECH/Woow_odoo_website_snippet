@@ -124,7 +124,7 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
             el.innerHTML = `
                 <div class="text-center text-danger py-4">
                     <i class="fa fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                    <small>${err.message || 'Error loading table data'}</small>
+                    <small>${this._escapeHtml((err && err.message) || 'Error loading table data')}</small>
                 </div>`;
         }
     },
@@ -169,7 +169,7 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
                 if (this._sortField === col.name) {
                     icon = this._sortOrder === 'asc' ? 'fa-sort-asc' : 'fa-sort-desc';
                 }
-                html += `<th class="woow_dt_sort" data-field="${col.name}"
+                html += `<th class="woow_dt_sort" data-field="${this._escapeHtml(col.name)}"
                              role="button" style="cursor:pointer;">
                     ${this._escapeHtml(col.string)}
                     <i class="fa ${icon} ms-1 small opacity-50"></i>
@@ -234,7 +234,8 @@ publicWidget.registry.s_woow_data_table = publicWidget.Widget.extend({
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     },
 });
 

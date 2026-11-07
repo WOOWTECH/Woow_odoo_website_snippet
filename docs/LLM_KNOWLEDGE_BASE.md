@@ -868,7 +868,7 @@ All templates set `data-number-of-elements-sm="1"` and share the same thumbnail 
 
 ### 6.4 Demo Data
 
-**File:** `data/woow_snippet_filter_data.xml` (noupdate="1")
+**File:** `demo/woow_snippet_filter_demo.xml` (noupdate="1")
 
 | XML ID | Model | Key fields |
 |--------|-------|-----------|
@@ -1113,7 +1113,7 @@ Set `data-series-field` (via the "Series Field" dropdown in CUSTOMIZE panel) to 
 | `static/src/snippets/s_woow_data_table/000.js` | Frontend widget for data table; pagination, search, sort |
 | `static/src/snippets/s_woow_data_table/options.js` | Editor options; dynamic model select; auto-populates first 5 fields |
 | `data/woow_dynamic_filter_templates.xml` | 6 QWeb templates for Dynamic Content layouts |
-| `data/woow_snippet_filter_data.xml` | Demo ir.filters + website.snippet.filter records (noupdate=1) |
+| `demo/woow_snippet_filter_demo.xml` | Demo ir.filters + website.snippet.filter records (noupdate=1) |
 | `views/snippets/snippets.xml` | Registers WoOW Dynamic group + 4 snippets in BLOCKS panel |
 | `views/snippets/s_woow_dynamic_content.xml` | Dynamic Content body + CUSTOMIZE options |
 | `views/snippets/s_woow_stat.xml` | Stat Card body + CUSTOMIZE options |
@@ -1199,7 +1199,7 @@ s_woow_data_table/options.js
 
 ### 9.4 Data Loading Order (from __manifest__.py)
 
-1. `data/woow_snippet_filter_data.xml` — demo ir.filters + website.snippet.filter records (noupdate=1)
+1. `demo/woow_snippet_filter_demo.xml` — demo ir.filters + website.snippet.filter records (noupdate=1)
 2. `data/woow_dynamic_filter_templates.xml` — 6 QWeb templates
 3. `views/snippets/snippets.xml` — snippet group + block registration
 4. `views/snippets/s_woow_dynamic_content.xml` — body + options

@@ -286,8 +286,9 @@ woow_snippet_builder/
 │   ├── __init__.py                      # 匯入 website_snippet_filter
 │   └── website_snippet_filter.py        # 繼承 website.snippet.filter，通用欄位映射
 ├── data/
-│   ├── woow_snippet_filter_data.xml     # 預設 Filter 資料（Contacts + Companies）
 │   └── woow_dynamic_filter_templates.xml # 6 個 QWeb 版型模板
+├── demo/
+│   └── woow_snippet_filter_demo.xml     # 示範 Filter 資料（Contacts + Companies，只在示範資料庫載入）
 ├── views/
 │   └── snippets/
 │       ├── snippets.xml                 # 註冊「WoOW Dynamic」群組 + 4 個元件
@@ -631,33 +632,29 @@ cp -r woow_snippet_builder /path/to/odoo/custom-addons/
 
 ### 模型白名單
 
-模組內建 **28 個允許查詢的模型**，定義在 `_DEFAULT_ALLOWED_MODELS` 中：
+自 18.0.2.0.1 起，公開端點**不再使用 `sudo()`**：所有查詢都以訪客自己的權限執行（ACL、記錄規則、欄位 `groups`）。此外只接受 `_DEFAULT_ALLOWED_MODELS` 中以網站展示為目的的模型（未安裝的模型自動忽略）：
 
 | 類別 | 模型 |
 |------|------|
-| **基礎** | `res.partner`、`res.company`、`res.users` |
-| **銷售** | `sale.order`、`sale.order.line` |
-| **產品** | `product.template`、`product.product` |
-| **採購** | `purchase.order`、`purchase.order.line` |
-| **會計** | `account.move`、`account.move.line` |
-| **庫存** | `stock.picking`、`stock.move` |
-| **專案** | `project.project`、`project.task` |
-| **人資** | `hr.employee`、`hr.department` |
-| **CRM** | `crm.lead` |
-| **客服** | `helpdesk.ticket` |
-| **活動** | `event.event`、`event.registration` |
-| **問卷** | `survey.survey`、`survey.user_input` |
-| **其他** | `fleet.vehicle`、`maintenance.request`、`lunch.order`、`website.page`、`blog.post` |
+| **產品** | `product.template`、`product.product`、`product.public.category` |
+| **活動** | `event.event`、`event.type` |
+| **網站內容** | `website.page`、`blog.post`、`slide.channel` |
+| **Home Assistant** | `ha.instance`、`ha.area`、`ha.device`、`ha.entity`、`ha.entity.history`、`ha.entity.group`、`ha.label`（只有 HA 使用者群組讀得到） |
+
+聯絡人、使用者、公司、人資、會計、銷售、採購、庫存、CRM、專案、客服、問卷、車隊、維護等模型已移除。
 
 ### 安全設計決策
 
 | 安全層面 | 實作方式 |
 |----------|----------|
-| **模型存取控制** | 白名單機制 — 僅白名單內的模型可透過公開端點查詢 |
-| **資料讀取** | 使用 `sudo()` 繞過 ACL，但受白名單約束 |
-| **Domain 解析** | 使用 `safe_eval` 搭配限制性全域變數（僅允許 True/False/None） |
-| **XSS 防護** | Data Table 的 `_escapeHtml()` 方法將 `&`、`<`、`>`、`"` 轉義為 HTML 實體 |
-| **端點分離** | 編輯器端點 `auth='user'`（需登入）；資料端點 `auth='public'` + `readonly=True` |
+| **資料讀取** | 公開端點與動態內容都以訪客環境查詢（不使用 `sudo()`），ACL 與記錄規則都生效 |
+| **模型存取控制** | 白名單機制 — 僅 `_get_allowed_models()` 內的模型可透過公開端點查詢 |
+| **欄位** | 欄位必須存在、不可帶 `groups` 限制；用於 domain、分組、聚合、排序時必須是 stored 欄位 |
+| **Domain 解析** | 只用 `ast.literal_eval`；只接受 `(欄位, 運算子, 值)` 與 `&`、`|`、`!`；禁止點號路徑；運算子限 `= != > >= < <= in not in ilike like`；關聯欄位只能比對 id |
+| **動態內容** | 訪客的 `search_domain` 只能用 filter 的 `field_names`；比照 core 加上網站、公司、`is_published` 限制；封存的 `ir.filters` 不再對外提供 |
+| **上限** | 分組最多 50 組、每頁最多 100 筆；數值參數會驗證（忽略 `nan`／`inf`） |
+| **端點分離** | 編輯器端點需 `website.group_website_restricted_editor`；資料端點 `auth='public'` + `readonly=True` |
+| **XSS 防護** | 統計卡、資料表格、圖表寫入 DOM 的值全部轉義（`_escapeHtml()`／`textContent`） |
 | **擴展機制** | 可覆寫 `_get_allowed_models()` 方法自訂白名單 |
 
 ### 擴充白名單

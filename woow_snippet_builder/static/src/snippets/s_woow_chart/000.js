@@ -89,11 +89,16 @@ publicWidget.registry.s_woow_chart = publicWidget.Widget.extend({
     _renderError(err) {
         const el = this.el.querySelector('.woow_chart_content');
         if (el) {
-            el.innerHTML = `
-                <div class="text-center text-danger py-4">
-                    <i class="fa fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                    <small>${err.message || 'Error loading chart data'}</small>
-                </div>`;
+            // Build the message with textContent: the error text comes from
+            // the server / request and must never be parsed as HTML.
+            const wrapper = document.createElement('div');
+            wrapper.className = 'text-center text-danger py-4';
+            const icon = document.createElement('i');
+            icon.className = 'fa fa-exclamation-triangle fa-2x mb-2 d-block';
+            const small = document.createElement('small');
+            small.textContent = (err && err.message) || 'Error loading chart data';
+            wrapper.append(icon, small);
+            el.replaceChildren(wrapper);
         }
     },
 
