@@ -345,3 +345,10 @@ msgstr "請登入以檢視此內容。"
 #: code:addons/woow_snippet_builder/static/src/snippets/woow_snippet_access.js:0
 msgid "Sign in"
 msgstr "登入"
+
+#. module: woow_snippet_builder
+#. odoo-python
+#: code:addons/woow_snippet_builder/models/website_snippet_filter.py:0
+msgid ""
+"Only administrators can bind a dynamic snippet filter to a server action."
+msgstr "只有系統管理員可以將動態元件篩選器綁定到伺服器動作。"

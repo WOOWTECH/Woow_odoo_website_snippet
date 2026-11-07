@@ -649,7 +649,7 @@ cp -r woow_snippet_builder /path/to/odoo/custom-addons/
 |----------|----------|
 | **登入** | `/woow_snippet/stat`、`/chart`、`/data_table` 為 `auth='user'` + `readonly=True`；未登入一律拒絕（session 過期錯誤），元件顯示登入提示 |
 | **資料讀取** | 資料端點與動態內容都以目前使用者的環境查詢（不使用 `sudo()`），ACL 與記錄規則都生效（例如入口網站使用者只看得到已發佈產品） |
-| **動態內容篩選器** | `security/ir.model.access.csv` 給 `website.group_website_designer` 管理 `website.snippet.filter` 的完整權限；不給公開讀取權限（core 以 `sudo()` 渲染篩選器） |
+| **動態內容篩選器** | `security/ir.model.access.csv` 給 `website.group_website_designer` 管理 `website.snippet.filter` 的完整權限；不給公開讀取權限（core 以 `sudo()` 渲染篩選器）。只有系統管理員（`base.group_system`）能把篩選器綁到尚未被任何篩選器使用的伺服器動作（`action_server_id`），因為 core 會替匿名訪客以 `sudo()` 執行它 |
 | **模型存取控制** | 白名單機制 — 僅 `_get_allowed_models()` 內的模型可透過資料端點查詢 |
 | **欄位** | 欄位必須存在、不可帶 `groups` 限制；用於 domain、分組、聚合、排序時必須是 stored 欄位 |
 | **Domain 解析** | 只用 `ast.literal_eval`；只接受 `(欄位, 運算子, 值)` 與 `&`、`|`、`!`；禁止點號路徑；運算子限 `= != > >= < <= in not in ilike like`；關聯欄位只能比對 id |

@@ -42,7 +42,7 @@ asset_bundles:
 ### 1.2 Anti-Features / Boundaries
 
 - No new Odoo models are defined; only `website.snippet.filter` is inherited
-- Ships `security/ir.model.access.csv`: website designers manage `website.snippet.filter`; no public ACL. Data endpoints are `auth='user'` and never use `.sudo()`
+- Ships `security/ir.model.access.csv`: website designers manage `website.snippet.filter`; no public ACL. Non-system users cannot bind `action_server_id` to a server action no filter uses yet (core runs it with sudo for anonymous visitors). Data endpoints are `auth='user'` and never use `.sudo()`
 - No CSS/SCSS files; all styling uses Bootstrap 5 utility classes
 - No backend views (menus, actions, forms, trees)
 - No cron jobs, mail templates, or workflow automations

@@ -3,8 +3,8 @@ from ast import literal_eval
 
 from lxml import etree, html as lxml_html
 
-from odoo import models
-from odoo.exceptions import MissingError, UserError
+from odoo import _, api, models
+from odoo.exceptions import AccessError, MissingError, UserError
 from odoo.osv import expression
 
 from ..tools.snippet_guard import parse_domain, to_int
@@ -14,6 +14,55 @@ _logger = logging.getLogger(__name__)
 
 class WebsiteSnippetFilter(models.Model):
     _inherit = 'website.snippet.filter'
+
+    # ------------------------------------------------------------------
+    # Server action binding guard
+    # ------------------------------------------------------------------
+
+    def _woow_check_action_server_binding(self, action_server_id):
+        """Only system administrators may bind a snippet filter to a new
+        server action.
+
+        Website designers have full access on this model (our
+        ``ir.model.access.csv``) so they can manage ``ir.filters`` based
+        Dynamic Content filters.  ``action_server_id`` however is run by
+        core ``_prepare_values`` with ``sudo()`` for any anonymous visitor
+        of ``/website/snippet/filters``: letting a designer point it at an
+        arbitrary ``ir.actions.server`` (e.g. a Python code action) would
+        let anyone execute that action as superuser.
+
+        Non-system users may therefore only use server actions that are
+        already bound to an existing snippet filter (i.e. approved by an
+        administrator or shipped by core / website_sale), which adds no
+        new exposure; anything else raises ``AccessError``.
+        """
+        if not action_server_id or self.env.su \
+                or self.env.user.has_group('base.group_system'):
+            return
+        if isinstance(action_server_id, models.BaseModel):
+            action_server_id = action_server_id.id
+        if self.sudo().search_count(
+                [('action_server_id', '=', action_server_id)], limit=1):
+            return
+        raise AccessError(_(
+            "Only administrators can bind a dynamic snippet filter to a "
+            "server action."))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            self._woow_check_action_server_binding(vals.get('action_server_id'))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if 'action_server_id' in vals:
+            new_action = vals['action_server_id']
+            if isinstance(new_action, models.BaseModel):
+                new_action = new_action.id
+            if any(rec.action_server_id.id != (new_action or False)
+                   for rec in self.sudo()):
+                self._woow_check_action_server_binding(new_action)
+        return super().write(vals)
 
     # ------------------------------------------------------------------
     # Render override

@@ -700,7 +700,7 @@ class CustomSnippetController(WoowSnippetController):
 |:------|:----------|
 | **Login** | `/woow_snippet/stat`, `/chart` and `/data_table` are `auth='user'` + `readonly=True`; anonymous callers are refused (session-expired error), the widgets render a sign-in notice |
 | **User rights** | The data endpoints and Dynamic Content search with the current user's environment (no `sudo()`); ACL and record rules apply (e.g. portal users only see published products) |
-| **Snippet filters** | `security/ir.model.access.csv` grants `website.group_website_designer` full access to `website.snippet.filter` (Dynamic Content filters); there is no public read access (core renders filters with `sudo()`) |
+| **Snippet filters** | `security/ir.model.access.csv` grants `website.group_website_designer` full access to `website.snippet.filter` (Dynamic Content filters); there is no public read access (core renders filters with `sudo()`). Only administrators (`base.group_system`) may bind a filter to a server action (`action_server_id`) that no existing filter uses yet: core runs it with `sudo()` for anonymous visitors |
 | **Whitelist** | `_validate_model()` checks the model name against `_get_allowed_models()` |
 | **Fields** | Fields must exist, must not carry a `groups` restriction and must be stored when used for domains, grouping, aggregation or sorting |
 | **Domain parsing** | `ast.literal_eval()` only; leaves `(field, operator, value)` plus `&`, `|`, `!`; no dotted paths; operators `= != > >= < <= in not in ilike like`; relational fields compare ids only |
